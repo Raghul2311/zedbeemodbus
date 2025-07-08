@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/theme.dart';
+import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/view_Pages/splash_screen.dart';
-
+import 'package:provider/provider.dart';
 
 final ThemeNotifier themeNotifier =
     ThemeNotifier(); // Global instance for theme..
@@ -15,7 +16,12 @@ void main() async {
     DeviceOrientation.landscapeRight,
     DeviceOrientation.landscapeLeft,
   ]);
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProviderServices())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

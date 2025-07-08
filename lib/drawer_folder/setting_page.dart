@@ -448,14 +448,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:zedbeemodbus/drawer_folder/parameters_list.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
 import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/model_folder/parameters_model.dart';
+import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/view_Pages/add_ahu.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
-
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -558,6 +560,8 @@ class _SettingPageState extends State<SettingPage> {
     // media queryies for height and width
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final provider = Provider.of<ProviderServices>(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -707,9 +711,17 @@ class _SettingPageState extends State<SettingPage> {
                   SpacerWidget.size8w,
                   // Add Parameter Button
                   GestureDetector(
-                    onTapDown: (details) {
-                      _showPopupMenu(context, details.globalPosition);
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ParametersList(),
+                        ),
+                      );
                     },
+                    // onTapDown: (details) {
+                    //   _showPopupMenu(context, details.globalPosition);
+                    // },
                     child: Container(
                       height: 50,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -760,7 +772,7 @@ class _SettingPageState extends State<SettingPage> {
                       ),
                     ),
                     // Draggable parameters
-                    ...draggableItems.asMap().entries.map((e) {
+                    ...provider.parameters.asMap().entries.map((e) {
                       final index = e.key;
                       final item = e.value;
                       return Positioned(
@@ -768,19 +780,11 @@ class _SettingPageState extends State<SettingPage> {
                         top: item.dy,
                         child: GestureDetector(
                           onPanUpdate: (details) {
-                            setState(() {
-                              draggableItems[index] = ParameterModel(
-                                text: item.text,
-                                dx: (item.dx + details.delta.dx).clamp(
-                                  0.0,
-                                  700,
-                                ),
-                                dy: (item.dy + details.delta.dy).clamp(
-                                  0.0,
-                                  350,
-                                ),
-                              );
-                            });
+                            provider.updatePosition(
+                              index,
+                              (item.dx + details.delta.dx).clamp(0.0, 700),
+                              (item.dy + details.delta.dy).clamp(0.0, 350),
+                            );
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -794,21 +798,15 @@ class _SettingPageState extends State<SettingPage> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  item.text,
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SpacerWidget.size8w,
-                                GestureDetector(
-                                  onTap: () => _removeItem(index),
-                                  child: const Icon(
+                                Text(item.text),
+                                IconButton(
+                                  icon: const Icon(
                                     Icons.close,
                                     size: 20,
                                     color: Colors.red,
                                   ),
+                                  onPressed: () =>
+                                      provider.removeParameter(index),
                                 ),
                               ],
                             ),
