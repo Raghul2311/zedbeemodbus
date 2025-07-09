@@ -348,6 +348,9 @@ import 'package:flutter/material.dart';
 import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
 import 'package:zedbeemodbus/model_folder/parameters_model.dart';
 
+void main() {
+  runApp(const MaterialApp(home: ModbusReadWriteScreen()));
+}
 
 class ModbusReadWriteScreen extends StatefulWidget {
   const ModbusReadWriteScreen({super.key});
@@ -364,7 +367,7 @@ class _ModbusReadWriteScreenState extends State<ModbusReadWriteScreen> {
   final int port = 502;
   final int unitId = 0;
   final int startAddress = 0;
-  final int registerCount = 8;
+  final int registerCount = 4;
 
   final TextEditingController valueController = TextEditingController();
   int? selectedRegister;
@@ -440,7 +443,7 @@ class _ModbusReadWriteScreenState extends State<ModbusReadWriteScreen> {
         }
         setState(() {
           registerValues = values;
-          status = "Read ${values.length} registers";
+          status = "Total ${values.length} registers";
         });
       } else {
         showSnackBar("Invalid response size", isError: true);

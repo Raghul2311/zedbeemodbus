@@ -6,7 +6,7 @@ final List<ParameterModel> _parameters = [];
 
   List<ParameterModel> get parameters => _parameters;
 
-  void addParameter(String name) {
+  void addParameter(String name, {required int index}) {
     _parameters.add(ParameterModel(text: name, dx: 50, dy: 100 + _parameters.length * 60));
     notifyListeners();
   }

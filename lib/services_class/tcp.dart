@@ -145,7 +145,7 @@ class _ModbusReadWriteScreenState extends State<ModbusReadWriteScreen> {
   final int port = 502;
   final int unitId = 0;
   final int startAddress = 0;
-  final int registerCount = 8;
+  final int registerCount = 4;
 
   final TextEditingController valueController = TextEditingController();
   int? selectedRegister;

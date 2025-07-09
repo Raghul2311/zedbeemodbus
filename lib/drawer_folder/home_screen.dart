@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // media query for height and width...
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-     // provider function for prameters load function......
+     // provider function for prameters load function
     final parameterList = context.watch<ProviderServices>().parameters;
 
     return Scaffold(
