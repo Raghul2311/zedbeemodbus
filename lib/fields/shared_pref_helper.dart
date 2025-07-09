@@ -22,12 +22,6 @@ class SharedPrefHelper {
     return jsonList.map((e) => ParameterModel.fromJson(e)).toList();
   }
 
-  // To remove the parameter
-  static Future<void> clearParameters() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_paramKey);
-  }
-
   // save selected chekbox indexes
   static Future<void> saveCheckedIndexes(List<int> indexes) async {
     final prefs = await SharedPreferences.getInstance();

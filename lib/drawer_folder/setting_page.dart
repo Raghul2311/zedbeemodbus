@@ -496,63 +496,18 @@ class _SettingPageState extends State<SettingPage> {
     super.initState();
     selectedType = equimentType.first;
     selectedName = equimentName.first;
-    loadSaved(); // save function
+    // loadSaved(); // save function
   }
 
-  // pop up menu for parameters...........
-  void _showPopupMenu(BuildContext context, Offset position) async {
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    final selected = await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromLTWH(position.dx, position.dy, 0, 0),
-        Offset.zero & overlay.size,
-      ),
-      items: parameters
-          .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
-          .toList(),
-    );
-
-    if (selected != null) {
-      setState(() {
-        draggableItems.add(
-          ParameterModel(
-            text: selected,
-            dx: 50,
-            dy: 150 + draggableItems.length * 60,
-          ),
-        );
-      });
-    }
-  }
-
-  // To save draggable items
+  // success message for saved parameters......
   void save() {
     SharedPrefHelper.saveParameters(draggableItems);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Saved')));
-  }
-
-  // clear all parameters (not used)
-  void clear() {
-    SharedPrefHelper.clearParameters();
-    setState(() => draggableItems.clear());
-  }
-
-  // remove each parameter function....
-  void _removeItem(int index) {
-    setState(() {
-      draggableItems.removeAt(index);
-    });
-  }
-
-  // To load the saved parameters in home screen container function
-  void loadSaved() async {
-    final items = await SharedPrefHelper.getParameters();
-    setState(() => draggableItems.addAll(items));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Parameter Saved', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   @override
@@ -560,7 +515,7 @@ class _SettingPageState extends State<SettingPage> {
     // media queryies for height and width
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
+    // provider funcrion for parameters...............
     final provider = Provider.of<ProviderServices>(context);
 
     return Scaffold(
@@ -719,9 +674,6 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       );
                     },
-                    // onTapDown: (details) {
-                    //   _showPopupMenu(context, details.globalPosition);
-                    // },
                     child: Container(
                       height: 50,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -787,10 +739,7 @@ class _SettingPageState extends State<SettingPage> {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
                             decoration: BoxDecoration(
                               color: Colors.orange.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(6),

@@ -1,15 +1,16 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, deprecated_member_use
 
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
 import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/model_folder/parameters_model.dart';
+import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,6 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // media query for height and width...
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+     // provider function for prameters load function......
+    final parameterList = context.watch<ProviderServices>().parameters;
+
     return Scaffold(
       backgroundColor: Theme.of(
         context,
@@ -187,14 +191,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                       // Parameter labels over image/gif
-                      ...savedParams.map(
+                      ...parameterList.map(
                         (param) => Positioned(
                           left: param.dx,
                           top: param.dy,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 15,
+                              vertical: 10,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.orange.withOpacity(0.8),
@@ -203,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Text(
                               param.text,
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
