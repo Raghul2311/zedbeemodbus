@@ -3,7 +3,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zedbeemodbus/drawer_folder/setting_page.dart';
+import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
+import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
 
 class ParametersList extends StatefulWidget {
@@ -19,6 +22,7 @@ class _ParametersListState extends State<ParametersList> {
   final int unitId = 0;
   final int startAddress = 0;
   final int registerCount = 8;
+  bool isSaving = false; // loading indicator
 
   List<int> registerValues = [];
   List<bool> isCheckedList = List.generate(8, (_) => false);
@@ -27,23 +31,38 @@ class _ParametersListState extends State<ParametersList> {
   String status = "Reading...";
 
   final List<String> parameterLabels = [
-    "Status", "Speed", "Temperature", "Humidity",
-    "Pressure", "Flow Rate", "Setpoint", "Error Code",
+    "Status",
+    "Speed",
+    "Temperature",
+    "Humidity",
+    "Pressure",
+    "Flow Rate",
+    "Setpoint",
+    "Error Code",
   ];
 
   @override
   void initState() {
     super.initState();
     readRegisters();
-    loadCheckedIndexes();
+    // Removed default selection
   }
 
   Future<void> readRegisters() async {
     try {
-      final socket = await Socket.connect(ip, port, timeout: const Duration(seconds: 5));
+      final socket = await Socket.connect(
+        ip,
+        port,
+        timeout: const Duration(seconds: 5),
+      );
 
       final request = Uint8List.fromList([
-        0x00, 0x01, 0x00, 0x00, 0x00, 0x06,
+        0x00,
+        0x01,
+        0x00,
+        0x00,
+        0x00,
+        0x06,
         unitId,
         0x03,
         (startAddress >> 8) & 0xFF,
@@ -94,22 +113,9 @@ class _ParametersListState extends State<ParametersList> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        backgroundColor: isError ? Colors.red : AppColors.green,
       ),
     );
-  }
-
-  void loadCheckedIndexes() async {
-    List<int> indexes = await SharedPrefHelper.getCheckedIndexes();
-    final provider = Provider.of<ProviderServices>(context, listen: false);
-    setState(() {
-      for (int i = 0; i < isCheckedList.length; i++) {
-        isCheckedList[i] = indexes.contains(i);
-        if (isCheckedList[i]) {
-          provider.addParameter(parameterLabels[i], index: i);
-        }
-      }
-    });
   }
 
   void saveSelectedParameters() async {
@@ -117,16 +123,32 @@ class _ParametersListState extends State<ParametersList> {
 
     if (provider.parameters.isEmpty) {
       showSnackBar("No parameters selected", isError: true);
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingPage()),
+        );
+      });
       return;
     }
 
-    await SharedPrefHelper.saveParameters(provider.parameters);
-    await SharedPrefHelper.saveCheckedIndexes(
-      provider.parameters.map((e) => e.registerIndex ?? 0).toList(),
-    );
+    setState(() => isSaving = true);
 
-    showSnackBar("Parameters saved!");
-    Navigator.pop(context);
+    try {
+      await SharedPrefHelper.saveParameters(provider.parameters);
+      await SharedPrefHelper.saveCheckedIndexes(
+        provider.parameters.map((e) => e.registerIndex ?? 0).toList(),
+      );
+
+      showSnackBar("Parameters saved!");
+      Navigator.pop(context);
+    } catch (e) {
+      showSnackBar("Error saving parameters: $e", isError: true);
+    } finally {
+      if (mounted) {
+        setState(() => isSaving = false);
+      }
+    }
   }
 
   Future<void> writeRegister(int address, int value) async {
@@ -136,10 +158,19 @@ class _ParametersListState extends State<ParametersList> {
     }
 
     try {
-      final socket = await Socket.connect(ip, port, timeout: const Duration(seconds: 5));
+      final socket = await Socket.connect(
+        ip,
+        port,
+        timeout: const Duration(seconds: 5),
+      );
 
       final request = Uint8List.fromList([
-        0x00, 0x02, 0x00, 0x00, 0x00, 0x06,
+        0x00,
+        0x02,
+        0x00,
+        0x00,
+        0x00,
+        0x06,
         unitId,
         0x06,
         (address >> 8) & 0xFF,
@@ -203,7 +234,12 @@ class _ParametersListState extends State<ParametersList> {
     final provider = Provider.of<ProviderServices>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Parameter List")),
+      appBar: AppBar(
+        title: const Text(
+          "Modbus Parameter",
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -221,13 +257,16 @@ class _ParametersListState extends State<ParametersList> {
                   subtitle: Text(
                     index < registerValues.length
                         ? "Register $index → ${registerValues[index]}"
-                        : "Register $index → N/A",
+                        : "Register $index → --",
                   ),
                   onChanged: (bool? checked) {
                     setState(() {
                       isCheckedList[index] = checked ?? false;
                       if (checked!) {
-                        provider.addParameter(parameterLabels[index], index: index);
+                        provider.addParameter(
+                          parameterLabels[index],
+                          index: index,
+                        );
                       } else {
                         provider.removeParameter(index);
                       }
@@ -250,11 +289,20 @@ class _ParametersListState extends State<ParametersList> {
                   items: isCheckedList
                       .asMap()
                       .entries
-                      .where((e) => e.value && (e.key == 0 || e.key == 1))
-                      .map((e) => DropdownMenuItem(
-                            value: e.key,
-                            child: Text("Register ${e.key}"),
-                          ))
+                      .where(
+                        (e) =>
+                            e.value &&
+                            (e.key == 0 || e.key == 1) &&
+                            e.key < registerValues.length,
+                      )
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e.key,
+                          child: Text(
+                            "Register ${e.key} → ${registerValues[e.key]}",
+                          ),
+                        ),
+                      )
                       .toList(),
                   onChanged: (val) => setState(() => selectedRegister = val),
                 ),
@@ -267,26 +315,56 @@ class _ParametersListState extends State<ParametersList> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: handleWrite,
-                  child: const Text("Write"),
+                SizedBox(
+                  height: 40,
+                  width: 100,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.darkblue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: handleWrite,
+                    child: const Text(
+                      "Write",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-
+          SpacerWidget.size16,
           // Save Button
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton.icon(
-              onPressed: saveSelectedParameters,
-              icon: const Icon(Icons.save),
-              label: const Text("Save Selected Parameters"),
+          SizedBox(
+            height: 48,
+            child: ElevatedButton(
+              onPressed: isSaving ? null : saveSelectedParameters,
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: AppColors.green,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
               ),
+              child: isSaving
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : const Text(
+                      'Save Parameter',
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
           ),
+
+          SpacerWidget.size64,
         ],
       ),
     );
