@@ -21,44 +21,32 @@ class _ParametersListState extends State<ParametersList> {
   final int port = 502;
   final int unitId = 0;
   final int startAddress = 0;
-  final int registerCount = 21;
+  final int registerCount = 10;
   bool isSaving = false; // loading indicator
 
   List<int> registerValues = [];
-  List<bool> isCheckedList = List.generate(8, (_) => false);
+  List<bool> isCheckedList = List.generate(11, (_) => false);
   final TextEditingController valueController = TextEditingController();
   int? selectedRegister;
   String status = "Reading...";
 
   final List<String> parameterLabels = [
-    "Frequency",
-    "Auto/Manual",
-    "Flowrate",
-    "Water Pressure",
-    "Duct Pressure",
-    "Running Hours",
-    "Running Hours",
+    "Status",
+    "Speed",
+    "Temperature",
+    "Humidity",
+    "Pressure",
+    "Flow Rate",
+    "Setpoint",
+    "Error Code",
     "BTU",
-    "BTU",
-    "Water In",
-    "Water Out",
-    "Supply Temperature",
-    "Return Temperature",
-    "Stop Condition",
-    "Fire Status",
-    "Trip Status",
-    "Filter Status",
-    "NONC Status",
-    "Run Status",
-    "Auto Manual Status",
-    "Set Temperature",
+    "BTS",
   ];
 
   @override
   void initState() {
     super.initState();
     readRegisters();
-    // Removed default selection
   }
 
   Future<void> readRegisters() async {
@@ -166,8 +154,17 @@ class _ParametersListState extends State<ParametersList> {
 
   Future<void> writeRegister(int address, int value) async {
     // only allow register 0 and 1
-    if (address != 1 && address != 2) {
-      showSnackBar("Only register 1 and 2 are writable", isError: true);
+    if (address != 0 && address != 1) {
+      showSnackBar("Only register 0 and 1 are writable", isError: true);
+      return;
+    }
+
+    // register enforce 0 or 1 only....
+    if (address == 0 && (value != 0 && value != 1)) {
+      showSnackBar(
+        "Status register only accepts 0 (Off) or 1 (On)",
+        isError: true,
+      );
       return;
     }
 
@@ -222,6 +219,15 @@ class _ParametersListState extends State<ParametersList> {
           selectedRegister = null;
         });
 
+        // show ON/OFF message if writing to "Status" register
+        if (address == 0) {
+          showSnackBar(
+            value == 1 ? "Device is ON" : "Device is OFF",
+            isError: false,
+          );
+        } else {
+          showSnackBar("Successfully wrote $value to register $address");
+        }
         await Future.delayed(const Duration(milliseconds: 300));
         readRegisters();
       } else {
@@ -256,7 +262,6 @@ class _ParametersListState extends State<ParametersList> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProviderServices>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -264,147 +269,167 @@ class _ParametersListState extends State<ParametersList> {
           style: TextStyle(fontSize: 18, color: Colors.white),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(status, style: const TextStyle(fontSize: 18)),
-          ),
-          const Divider(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: parameterLabels.length,
-              itemBuilder: (context, index) {
-                int registerAddress = index + 1;
-                return CheckboxListTile(
-                  checkColor: Colors.white,
-                  activeColor: AppColors.darkblue,
-                  value: isCheckedList[index],
-                  title: Text(parameterLabels[index]),
-                  subtitle: Text(
-                    registerAddress < registerValues.length
-                        ? "Register $registerAddress → ${registerValues[registerAddress]}"
-                        : "Register $registerAddress → --",
-                  ),
-                  onChanged: (bool? checked) {
-                    setState(() {
-                      isCheckedList[index] = checked ?? false;
-                      if (checked!) {
-                        provider.addParameter(
-                          parameterLabels[index],
-                          index: registerAddress,
-                        );
-                      } else {
-                        provider.removeParameter(registerAddress);
-                      }
-                    });
+          // Main Body Column
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(status, style: const TextStyle(fontSize: 18)),
+              ),
+              const Divider(),
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: parameterLabels.length,
+                  itemBuilder: (context, index) {
+                    return CheckboxListTile(
+                      checkColor: Colors.white,
+                      activeColor: AppColors.darkblue,
+                      value: isCheckedList[index],
+                      title: Text(parameterLabels[index]),
+                      subtitle: Text(
+                        index < registerValues.length
+                            ? "Register $index → ${registerValues[index]}"
+                            : "Register $index → --",
+                      ),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                          isCheckedList[index] = checked ?? false;
+                          if (checked!) {
+                            provider.addParameter(
+                              parameterLabels[index],
+                              index: index,
+                            );
+                          } else {
+                            provider.removeParameter(index);
+                          }
+                        });
+                      },
+                    );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+              const SizedBox(height: 150),
+            ],
           ),
-          const Divider(),
-
-          // Write Section
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                DropdownButton<int>(
-                  value: selectedRegister,
-                  hint: const Text("Select Register"),
-                  items: isCheckedList
-                      .asMap()
-                      .entries
-                      .where(
-                        (e) =>
-                            e.value &&
-                            (e.key == 0 || e.key == 1) &&
-                            e.key < registerValues.length,
-                      )
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.key,
-                          child: Text(
-                            "Register ${e.key} → ${registerValues[e.key]}",
+          // Floating Container Positioned at Bottom
+          Positioned(
+            left: 10,
+            right: 10,
+            bottom: 10,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      DropdownButton<int>(
+                        value: selectedRegister,
+                        hint: const Text("Select Register"),
+                        items: isCheckedList
+                            .asMap()
+                            .entries
+                            .where(
+                              (e) =>
+                                  e.value &&
+                                  (e.key == 0 || e.key == 1) &&
+                                  e.key < registerValues.length,
+                            )
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.key,
+                                child: Text(
+                                  "Register ${e.key} → ${registerValues[e.key]}",
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (val) =>
+                            setState(() => selectedRegister = val),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: valueController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            labelText: "Value",
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                      )
-                      .toList(),
-                  onChanged: (val) => setState(() => selectedRegister = val),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: valueController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.darkblue),
                       ),
-                      labelText: "Value",
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black12),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: handleWrite,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.darkblue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text(
+                          "Write",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Save Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton(
+                      onPressed: isSaving ? null : saveSelectedParameters,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: isSaving
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                          : const Text(
+                              "Save Parameter",
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                SizedBox(
-                  height: 40,
-                  width: 100,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.darkblue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: handleWrite,
-                    child: const Text(
-                      "Write",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SpacerWidget.size16,
-          // Save Button
-          SizedBox(
-            height: 48,
-            child: ElevatedButton(
-              onPressed: isSaving ? null : saveSelectedParameters,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                ],
               ),
-
-              child: isSaving
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2.5,
-                      ),
-                    )
-                  : const Text(
-                      'Save Parameter',
-                      style: TextStyle(color: Colors.white),
-                    ),
             ),
           ),
-
-          SpacerWidget.size64,
         ],
       ),
     );
