@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zedbeemodbus/drawer_folder/setting_page.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
@@ -252,6 +253,8 @@ class _ParametersListState extends State<ParametersList> {
               itemCount: parameterLabels.length,
               itemBuilder: (context, index) {
                 return CheckboxListTile(
+                  checkColor: Colors.white,
+                  activeColor: AppColors.darkblue,
                   value: isCheckedList[index],
                   title: Text(parameterLabels[index]),
                   subtitle: Text(
@@ -309,9 +312,18 @@ class _ParametersListState extends State<ParametersList> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: valueController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: "Value"),
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.darkblue),
+                      ),
+                      labelText: "Value",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black12),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -346,8 +358,12 @@ class _ParametersListState extends State<ParametersList> {
               onPressed: isSaving ? null : saveSelectedParameters,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 24),
               ),
+
               child: isSaving
                   ? const SizedBox(
                       width: 24,
