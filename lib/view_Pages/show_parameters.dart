@@ -375,13 +375,23 @@ class _ModbusReadWriteScreenState extends State<ModbusReadWriteScreen> {
   // Labels and checkbox state
   final List<String> parameterLabels = [
     "Status",
-    "Speed",
-    "Temperature",
-    "Humidity",
-    "Pressure",
-    "Flow Rate",
-    "Setpoint",
-    "Error Code",
+    "Frequency",
+    "Auto/Manual",
+    "Flowrate",
+    "Water Pressure",
+    "Running Hours",
+    "Running Hours",
+    "BTU",
+    "BTU",
+    "Water In"
+    "Water Out"
+    "Supply Temperature"
+    "Return Temperature"
+    "Trip Status"
+    "Filter Status"
+    "Run Status"
+    "Auto Manual Status"
+    "Set Temperature"
   ];
   List<bool> isCheckedList = List.generate(8, (_) => false);
 

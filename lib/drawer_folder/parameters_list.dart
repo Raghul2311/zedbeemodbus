@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +21,7 @@ class _ParametersListState extends State<ParametersList> {
   final int port = 502;
   final int unitId = 0;
   final int startAddress = 0;
-  final int registerCount = 8;
+  final int registerCount = 21;
   bool isSaving = false; // loading indicator
 
   List<int> registerValues = [];
@@ -32,14 +31,27 @@ class _ParametersListState extends State<ParametersList> {
   String status = "Reading...";
 
   final List<String> parameterLabels = [
-    "Status",
-    "Speed",
-    "Temperature",
-    "Humidity",
-    "Pressure",
-    "Flow Rate",
-    "Setpoint",
-    "Error Code",
+    "Frequency",
+    "Auto/Manual",
+    "Flowrate",
+    "Water Pressure",
+    "Duct Pressure",
+    "Running Hours",
+    "Running Hours",
+    "BTU",
+    "BTU",
+    "Water In",
+    "Water Out",
+    "Supply Temperature",
+    "Return Temperature",
+    "Stop Condition",
+    "Fire Status",
+    "Trip Status",
+    "Filter Status",
+    "NONC Status",
+    "Run Status",
+    "Auto Manual Status",
+    "Set Temperature",
   ];
 
   @override
@@ -153,8 +165,9 @@ class _ParametersListState extends State<ParametersList> {
   }
 
   Future<void> writeRegister(int address, int value) async {
-    if (address != 0 && address != 1) {
-      showSnackBar("Only register 0 and 1 are writable", isError: true);
+    // only allow register 0 and 1
+    if (address != 1 && address != 2) {
+      showSnackBar("Only register 1 and 2 are writable", isError: true);
       return;
     }
 
@@ -196,13 +209,23 @@ class _ParametersListState extends State<ParametersList> {
       final response = await completer.future;
       socket.destroy();
 
-      if (response[7] == 0x06) {
-        showSnackBar("Wrote $value to register $address");
+      // Validate function code and echo values
+      final functionCode = response[7];
+      final responseAddress = (response[8] << 8) | response[9];
+      final responseValue = (response[10] << 8) | response[11];
+
+      if (functionCode == 0x06 &&
+          responseAddress == address &&
+          responseValue == value) {
         valueController.clear();
-        setState(() => selectedRegister = null);
+        setState(() {
+          selectedRegister = null;
+        });
+
+        await Future.delayed(const Duration(milliseconds: 300));
         readRegisters();
       } else {
-        showSnackBar("Write failed", isError: true);
+        showSnackBar("Write failed: Invalid response", isError: true);
       }
     } catch (e) {
       showSnackBar("Write error: $e", isError: true);
@@ -252,15 +275,16 @@ class _ParametersListState extends State<ParametersList> {
             child: ListView.builder(
               itemCount: parameterLabels.length,
               itemBuilder: (context, index) {
+                int registerAddress = index + 1;
                 return CheckboxListTile(
                   checkColor: Colors.white,
                   activeColor: AppColors.darkblue,
                   value: isCheckedList[index],
                   title: Text(parameterLabels[index]),
                   subtitle: Text(
-                    index < registerValues.length
-                        ? "Register $index → ${registerValues[index]}"
-                        : "Register $index → --",
+                    registerAddress < registerValues.length
+                        ? "Register $registerAddress → ${registerValues[registerAddress]}"
+                        : "Register $registerAddress → --",
                   ),
                   onChanged: (bool? checked) {
                     setState(() {
@@ -268,10 +292,10 @@ class _ParametersListState extends State<ParametersList> {
                       if (checked!) {
                         provider.addParameter(
                           parameterLabels[index],
-                          index: index,
+                          index: registerAddress,
                         );
                       } else {
-                        provider.removeParameter(index);
+                        provider.removeParameter(registerAddress);
                       }
                     });
                   },
