@@ -13,7 +13,7 @@ class ProviderServices extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeParameter(int registerIndex) {
+  void uncheckParameter(int registerIndex) {
     _parameters.removeWhere((param) => param.registerIndex == registerIndex);
     notifyListeners();
   }
@@ -27,5 +27,10 @@ class ProviderServices extends ChangeNotifier {
   void clearParameters() {
     _parameters.clear();
     notifyListeners();
+  }
+
+  void removeParameter(int index) {
+    parameters.removeAt(index);
+    notifyListeners(); 
   }
 }

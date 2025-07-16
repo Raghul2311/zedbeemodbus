@@ -515,8 +515,9 @@ class _SettingPageState extends State<SettingPage> {
     // media queryies for height and width
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    // provider funcrion for parameters...............
+    // provider function for parameters...............
     final provider = Provider.of<ProviderServices>(context);
+    
 
     return Scaffold(
       key: _scaffoldKey,
