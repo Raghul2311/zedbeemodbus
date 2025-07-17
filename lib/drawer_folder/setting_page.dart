@@ -71,7 +71,6 @@ class _SettingPageState extends State<SettingPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     // provider function for parameters...............
     final provider = Provider.of<ProviderServices>(context);
-    
 
     return Scaffold(
       key: _scaffoldKey,
@@ -225,7 +224,7 @@ class _SettingPageState extends State<SettingPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ParametersList(),
+                          builder: (context) => ParametersListScreen(),
                         ),
                       );
                     },
@@ -302,7 +301,13 @@ class _SettingPageState extends State<SettingPage> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(item.text),
+                                Text(
+                                  "${item.text}: ${item.value.isEmpty ? '--' : item.value}",
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 IconButton(
                                   icon: const Icon(
                                     Icons.close,
