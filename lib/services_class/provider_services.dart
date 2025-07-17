@@ -8,11 +8,13 @@ class ProviderServices extends ChangeNotifier {
 
   final List<ParameterModel> _parameters = [];
   List<int> _latestValues = [];
-  Timer? _autoRefreshTimer;
+  Timer? _autoRefreshTimer; // auto refresh 5 seconds
+  bool _isWriting = false; // boolean for pasuse refresh....
 
   List<ParameterModel> get parameters => _parameters;
   List<int> get latestValues => _latestValues;
 
+  // add parameter function
   void addParameter(String name, {required int index}) {
     if (!_parameters.any((param) => param.registerIndex == index)) {
       _parameters.add(
@@ -23,15 +25,17 @@ class ProviderServices extends ChangeNotifier {
           registerIndex: index,
         ),
       );
-      notifyListeners();
+      notifyListeners(); // listen the added parameter
     }
   }
 
+  // remove parameter function...........
   void removeParameter(int registerIndex) {
     _parameters.removeWhere((param) => param.registerIndex == registerIndex);
     notifyListeners();
   }
 
+  // remove parameter by index.......
   void removeParameterByIndex(int index) {
     if (index >= 0 && index < _parameters.length) {
       _parameters.removeAt(index);
@@ -39,6 +43,7 @@ class ProviderServices extends ChangeNotifier {
     }
   }
 
+  // update the parmeter position funciton........
   void updatePosition(int index, double dx, double dy) {
     if (index >= 0 && index < _parameters.length) {
       final item = _parameters[index];
@@ -53,7 +58,9 @@ class ProviderServices extends ChangeNotifier {
     }
   }
 
+  // fetch the registers for parameter function...........
   Future<void> fetchRegisters() async {
+    if (_isWriting) return;
     try {
       _latestValues = await _modbusService.readRegisters(0, 43);
       for (var param in _parameters) {
@@ -68,11 +75,21 @@ class ProviderServices extends ChangeNotifier {
     }
   }
 
+  // write parameter by register
   Future<void> writeRegister(int address, int value) async {
-    await _modbusService.writeRegister(address, value);
-    await fetchRegisters();
+    _isWriting = true;
+    stopAutoRefresh();
+    try {
+      await _modbusService.writeRegister(address, value);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await fetchRegisters();
+    } finally {
+      _isWriting = false;
+      startAutoRefresh();
+    }
   }
 
+  // refresh every 5 second .........
   void startAutoRefresh() {
     _autoRefreshTimer?.cancel();
     _autoRefreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
@@ -84,10 +101,12 @@ class ProviderServices extends ChangeNotifier {
     _autoRefreshTimer?.cancel();
   }
 
+  // selection of parmeters ........
   bool isParameterSelected(int registerIndex) {
     return _parameters.any((param) => param.registerIndex == registerIndex);
   }
 
+  // clear all the parmeter
   void clearParameters() {
     _parameters.clear();
     notifyListeners();
