@@ -19,14 +19,14 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   final List<String> parameterLabels = [
     "Status", // 00000
     "Frequency", // 00001
-    "Auto Manual", // 00002
+    "Auto/Manual", // 00002
     "Flowrate", // 00003
     "Water Pressure", // 00004
-    "Running hours (trip)", // 00005
-    "Running hours (filter)", // 00006
-    "BTU (-5584)", // 00007
-    "BTU (13)", // 00008
-    "Set Temp", // 00009
+    "Duct Pressure", // 00005
+    "Running hours", // 00006
+    "Running hours", // 00007
+    "BTU", // 00008
+    "BTU", // 00009
     "Water In", // 00010
     "Water Out", // 00011
     "Supply Temperature", // 00012
@@ -52,8 +52,8 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     "VAV Number", // 00032
     "PID Constant", // 00033
     "Ductset Pressure", // 00034
-    "Minimum FlowRate", // 00035
-    "Maximum FlowRate", // 00036
+    "Maximun FlowRate", // 00035
+    "Minimum FlowRate", // 00036
     "Pressure Constant", // 00037
     "Inlet Threshold", // 00038
     "Actuator Direction", // 00039

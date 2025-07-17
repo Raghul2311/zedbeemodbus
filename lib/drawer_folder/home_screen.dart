@@ -1,11 +1,9 @@
 // ignore_for_file: unused_local_variable, deprecated_member_use
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
 import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/model_folder/parameters_model.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
@@ -34,10 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     updateTime();
     Timer.periodic(const Duration(seconds: 1), (timer) => updateTime());
-    SharedPrefHelper.getParameters().then(
-      (list) => setState(() => savedParams = list),
-    );
-    loadSavedParameters(); // load function...
+    final provider = context.read<ProviderServices>(); // To read the live data
+    provider.startAutoRefresh(); // refresh every 5 seconds...
   }
 
   // To get the upadated time...........
@@ -49,22 +45,13 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => currentTime = formatted);
   }
 
-  // load parameter function
-  void loadSavedParameters() async {
-    final items = await SharedPrefHelper.getParameters();
-    setState(() {
-      savedParams = items;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // media query for height and width...
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-     // provider function for prameters load function
-    final parameterList = context.watch<ProviderServices>().parameters;
-
+    final provider = context
+        .watch<ProviderServices>(); // listen and update in UI
     return Scaffold(
       backgroundColor: Theme.of(
         context,
@@ -189,10 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.fill,
                           ),
                         ),
-
-                      // Parameter labels over image/gif
-                      ...parameterList.map(
-                        (param) => Positioned(
+                      // parameter from provider dynamically
+                      ...provider.parameters.map((param) {
+                        return Positioned(
                           left: param.dx,
                           top: param.dy,
                           child: Container(
@@ -205,15 +191,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              param.text,
+                              "${param.text}: ${param.value.isEmpty ? '--' : param.value}",
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                     ],
                   ),
                 ),

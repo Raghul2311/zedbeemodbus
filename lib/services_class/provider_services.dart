@@ -55,7 +55,7 @@ class ProviderServices extends ChangeNotifier {
 
   Future<void> fetchRegisters() async {
     try {
-      _latestValues = await _modbusService.readRegisters(0, 42);
+      _latestValues = await _modbusService.readRegisters(0, 43);
       for (var param in _parameters) {
         if (param.registerIndex != null &&
             param.registerIndex! < _latestValues.length) {
