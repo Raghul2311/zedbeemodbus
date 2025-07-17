@@ -52,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final provider = context
         .watch<ProviderServices>(); // listen and update in UI
+    final parameters = provider.parameters;
+    final latestValue = provider.latestValues;
+    final statusValue = latestValue.isNotEmpty ? latestValue[0] : 0;
+
     return Scaffold(
       backgroundColor: Theme.of(
         context,
@@ -79,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'ON',
                           style: TextStyle(
                             fontSize: 18,
-                            color: isSwitched
+                            color: (statusValue == 1)
                                 ? Theme.of(context).textTheme.bodyMedium?.color
                                 : Colors.grey,
                             fontWeight: FontWeight.bold,
@@ -88,9 +92,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Switch(
-                            value: isSwitched,
-                            onChanged: (value) =>
-                                setState(() => isSwitched = value),
+                            value: statusValue == 1,
+                            onChanged: (value) {
+                              final newStatus = value ? 1 : 0;
+                              provider.writeRegister(0, newStatus);
+                            },
                             activeColor: Theme.of(
                               context,
                             ).colorScheme.onPrimary,
@@ -107,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'OFF',
                           style: TextStyle(
                             fontSize: 18,
-                            color: isSwitched
+                            color: (statusValue == 1)
                                 ? Colors.grey
                                 : Theme.of(context).textTheme.bodyMedium?.color,
                             fontWeight: FontWeight.bold,
@@ -153,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Stack(
                     children: [
-                      if (isSwitched)
+                      if (statusValue == 1)
                         Positioned(
                           top: 20,
                           bottom: 0,
@@ -176,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.fill,
                           ),
                         ),
+
                       // parameter from provider dynamically
                       ...provider.parameters.map((param) {
                         return Positioned(
