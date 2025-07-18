@@ -16,58 +16,60 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   int? selectedRegister;
   bool isSaving = false;
 
-  final List<String> parameterLabels = [
-    "Status", // 00000
-    "Frequency", // 00001
-    "Auto/Manual", // 00002
-    "Flowrate", // 00003
-    "Water Pressure", // 00004
-    "Duct Pressure", // 00005
-    "Running hours", // 00006
-    "Running hours", // 00007
-    "BTU", // 00008
-    "BTU", // 00009
-    "Water In", // 00010
-    "Water Out", // 00011
-    "Supply Temperature", // 00012
-    "Return Temperature", // 00013
-    "Stop Condition", // 00014
-    "Fire Status", // 00015
-    "Trip Status", // 00016
-    "Filter Status", // 00017
-    "NONC Status", // 00018
-    "Run Status", // 00019
-    "Auto/Manual Status", // 00020
-    "N/A", // 00021
-    "N/A", // 00022
-    "Water Value", // 00023
-    "N/A", // 00024
-    "Voltage", // 00025
-    "Current", // 00026
-    "Power", // 00027
-    "Delta TAverage", // 00028
-    "Set Temperature", // 00029
-    "Minimum Frequency", // 00030
-    "Maximum Frequency", // 00031
-    "VAV Number", // 00032
-    "PID Constant", // 00033
-    "Ductset Pressure", // 00034
-    "Maximun FlowRate", // 00035
-    "Minimum FlowRate", // 00036
-    "Pressure Constant", // 00037
-    "Inlet Threshold", // 00038
-    "Actuator Direction", // 00039
-    "Actuator Type", // 00040
-    "Minimum Act Position", // 00041
-    "Ramp Up Sel", // 00042
+  final List<Map<String, String>> parameters = [
+    {"name": "Status", "unit": ""},
+    {"name": "Frequency", "unit": "Hz"},
+    {"name": "Auto/Manual", "unit": ""},
+    {"name": "Flowrate", "unit": "m³/h"},
+    {"name": "Water Pressure", "unit": "bar"},
+    {"name": "Duct Pressure", "unit": "bar"},
+    {"name": "Running Hours 1", "unit": "hr"},
+    {"name": "Running Hours 2", "unit": "hr"},
+    {"name": "BTU 1", "unit": "kWh"},
+    {"name": "BTU 2", "unit": "kWh"},
+    {"name": "Water In", "unit": "°C"},
+    {"name": "Water Out", "unit": "°C"},
+    {"name": "Supply Temp", "unit": "°C"},
+    {"name": "Return Temp", "unit": "°C"},
+    {"name": "Stop Condition", "unit": ""},
+    {"name": "Fire Status", "unit": ""},
+    {"name": "Trip Status", "unit": ""},
+    {"name": "Filter Status", "unit": ""},
+    {"name": "NONC Status", "unit": ""},
+    {"name": "Run Status", "unit": ""},
+    {"name": "Auto/Manual Status", "unit": ""},
+    {"name": "N/A", "unit": ""},
+    {"name": "N/A", "unit": ""},
+    {"name": "Water Value", "unit": ""},
+    {"name": "N/A", "unit": ""},
+    {"name": "Voltage", "unit": "V"},
+    {"name": "Current", "unit": "A"},
+    {"name": "Power", "unit": "kW"},
+    {"name": "Delta T Avg", "unit": "°C"},
+    {"name": "Set Temperature", "unit": "°C"},
+    {"name": "Min Frequency", "unit": "Hz"},
+    {"name": "Max Frequency", "unit": "Hz"},
+    {"name": "VAV Number", "unit": ""},
+    {"name": "PID Constant", "unit": ""},
+    {"name": "Ductset Pressure", "unit": "bar"},
+    {"name": "Max FlowRate", "unit": "m³/h"},
+    {"name": "Min FlowRate", "unit": "m³/h"},
+    {"name": "Pressure Constant", "unit": ""},
+    {"name": "Inlet Threshold", "unit": ""},
+    {"name": "Actuator Direction", "unit": ""},
+    {"name": "Actuator Type", "unit": ""},
+    {"name": "Min Act Position", "unit": ""},
+    {"name": "Ramp Up Sel", "unit": ""},
   ];
+
+  List<int> selectedIndexes = [];
 
   @override
   void initState() {
     super.initState();
     final provider = Provider.of<ProviderServices>(context, listen: false);
     provider.fetchRegisters();
-    provider.startAutoRefresh(); // auto update every 5 sec
+    provider.startAutoRefresh();
   }
 
   void handleWrite() {
@@ -94,7 +96,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     setState(() {
       selectedRegister = null;
     });
-    showSnackBar("Value updated successfully");
+    showSnackBar("parameter updated successfully");
   }
 
   void showSnackBar(String message) {
@@ -104,9 +106,11 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   }
 
   void saveSelectedParameters() async {
+    final provider = Provider.of<ProviderServices>(context, listen: false);
+    provider.addParameters(selectedIndexes, parameters);
     setState(() => isSaving = true);
     await Future.delayed(const Duration(seconds: 1));
-    Navigator.pop(context); // or navigate to Settings
+    Navigator.pop(context);
   }
 
   @override
@@ -116,82 +120,94 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Modbus Parameter",
+          "Modbus Parameters",
           style: TextStyle(fontSize: 18, color: Colors.white),
         ),
         backgroundColor: AppColors.darkblue,
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Registers Loaded: ${provider.latestValues.length}",
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-              const Divider(),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.green,
-                  onRefresh: () => provider.fetchRegisters(),
-                  child: ListView.builder(
-                    itemCount: parameterLabels.length,
+          RefreshIndicator(
+            color: AppColors.green,
+            onRefresh: () => provider.fetchRegisters(),
+            child: Column(
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(10),
+                    itemCount: parameters.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4, // Show 2 per row
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 2.2,
+                        ),
                     itemBuilder: (context, index) {
-                      final paramName = parameterLabels[index];
+                      final param = parameters[index];
+                      final isSelected = selectedIndexes.contains(index);
                       final value = (index < provider.latestValues.length)
                           ? provider.latestValues[index].toString()
                           : "--";
 
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedIndexes.remove(index);
+                            } else {
+                              selectedIndexes.add(index);
+                            }
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.green
+                                  : Colors.grey.shade300,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              Text(
+                                param["name"]!,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Checkbox(
-                                    value: provider.parameters.any(
-                                      (p) => p.registerIndex == index,
-                                    ),
-                                    activeColor: AppColors.darkblue,
-                                    onChanged: (checked) {
-                                      if (checked == true) {
-                                        provider.addParameter(
-                                          paramName,
-                                          index: index,
-                                        );
-                                      } else {
-                                        provider.removeParameter(index);
-                                      }
-                                    },
-                                  ),
-                                  const SizedBox(width: 8),
                                   Text(
-                                    paramName,
+                                    value,
                                     style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    param["unit"]!,
+                                    style: const TextStyle(fontSize: 14),
                                   ),
                                 ],
-                              ),
-                              Text(
-                                value,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
-                                ),
                               ),
                             ],
                           ),
@@ -200,9 +216,9 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                     },
                   ),
                 ),
-              ),
-              const SizedBox(height: 150),
-            ],
+                SizedBox(height: 150),
+              ],
+            ),
           ),
           Positioned(
             left: 10,
@@ -229,11 +245,11 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                       DropdownButton<int>(
                         value: selectedRegister,
                         hint: const Text("Select Register"),
-                        items: provider.parameters
+                        items: selectedIndexes
                             .map(
                               (e) => DropdownMenuItem(
-                                value: e.registerIndex,
-                                child: Text(e.text),
+                                value: e,
+                                child: Text(parameters[e]["name"]!),
                               ),
                             )
                             .toList(),
