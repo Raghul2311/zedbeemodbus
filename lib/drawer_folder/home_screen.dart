@@ -121,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-
                     SpacerWidget.size16w,
                     // Current Time
                     Text(

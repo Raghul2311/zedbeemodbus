@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import '../fields/colors.dart';
 import '../services_class/provider_services.dart';
 
@@ -62,16 +65,17 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     {"name": "Ramp Up Sel", "unit": ""},
   ];
 
-  List<int> selectedIndexes = [];
+  List<int> selectedIndexes = []; // store the selected index..
 
   @override
   void initState() {
     super.initState();
     final provider = Provider.of<ProviderServices>(context, listen: false);
     provider.fetchRegisters();
-    provider.startAutoRefresh();
+    provider.startAutoRefresh(); // auto refresh 5 seconds
   }
 
+  // write parameter fucntion.......
   void handleWrite() {
     final provider = Provider.of<ProviderServices>(context, listen: false);
     final valueText = valueController.text.trim();
@@ -90,7 +94,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
       showSnackBar("Invalid number");
       return;
     }
-
+    // get the register of paramter to write
     provider.writeRegister(selectedRegister!, value);
     valueController.clear();
     setState(() {
@@ -105,6 +109,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  // save the selected parameters
   void saveSelectedParameters() async {
     final provider = Provider.of<ProviderServices>(context, listen: false);
     provider.addParameters(selectedIndexes, parameters);
@@ -116,6 +121,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProviderServices>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark; // Theme
 
     return Scaffold(
       appBar: AppBar(
@@ -138,7 +144,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                     itemCount: parameters.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4, // Show 2 per row
+                          crossAxisCount: 4, // Show 4 per row
                           mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
                           childAspectRatio: 2.2,
@@ -146,10 +152,20 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                     itemBuilder: (context, index) {
                       final param = parameters[index];
                       final isSelected = selectedIndexes.contains(index);
-                      final value = (index < provider.latestValues.length)
-                          ? provider.latestValues[index].toString()
-                          : "--";
-
+                      // 0 for OFF and 1 for ON.........
+                      String value;
+                      if (index < provider.latestValues.length) {
+                        if (index == 0) {
+                          value = provider.latestValues[index] == 1
+                              ? "ON"
+                              : "OFF";
+                        } else {
+                          value = provider.latestValues[index].toString();
+                        }
+                      } else {
+                        value = "--";
+                      }
+                      // select the parmeter
                       return GestureDetector(
                         onTap: () {
                           setState(() {
@@ -164,7 +180,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
@@ -186,26 +202,35 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                             children: [
                               Text(
                                 param["name"]!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
+                                  color: isDark ? Colors.white : Colors.black87,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              SpacerWidget.size8w,
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
                                     value,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
+                                  SpacerWidget.size8w,
                                   Text(
                                     param["unit"]!,
-                                    style: const TextStyle(fontSize: 14),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isDark
+                                          ? Colors.grey[300]
+                                          : Colors.black54,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -220,6 +245,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
               ],
             ),
           ),
+          // floating action container ..........
           Positioned(
             left: 10,
             right: 10,
@@ -227,11 +253,13 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black54
+                        : Colors.black26,
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -242,19 +270,51 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                 children: [
                   Row(
                     children: [
-                      DropdownButton<int>(
-                        value: selectedRegister,
-                        hint: const Text("Select Register"),
-                        items: selectedIndexes
-                            .map(
-                              (e) => DropdownMenuItem(
-                                value: e,
-                                child: Text(parameters[e]["name"]!),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (val) =>
-                            setState(() => selectedRegister = val),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.grey.shade400,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: DropdownButton<int>(
+                          value: selectedRegister,
+                          dropdownColor: Theme.of(context).cardColor,
+                          underline: SizedBox(),
+                          iconEnabledColor:
+                              Theme.of(context).brightness == Brightness.dark
+                              ? Colors
+                                    .white 
+                              : Colors.black, 
+                          hint: Text(
+                            "Select Register",
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.color,
+                            ),
+                          ),
+                          items: selectedIndexes
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    parameters[e]["name"]!,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) =>
+                              setState(() => selectedRegister = val),
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -264,10 +324,20 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Value",
                             isDense: true,
                             border: OutlineInputBorder(),
+                            labelStyle: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.color,
+                            ),
+                          ),
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color,
                           ),
                         ),
                       ),
@@ -287,7 +357,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SpacerWidget.medium,
                   SizedBox(
                     width: double.infinity,
                     height: 44,
