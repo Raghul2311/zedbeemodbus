@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/theme.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
-import 'package:zedbeemodbus/view_Pages/splash_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:zedbeemodbus/view_Pages/splash_screen.dart';
 
 final ThemeNotifier themeNotifier =
     ThemeNotifier(); // Global instance for theme..
@@ -18,7 +18,12 @@ void main() async {
   ]);
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => ProviderServices())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProviderServices()),
+        // ChangeNotifierProvider(
+        //   create: (_) => ProviderServicesClass(),
+        // ),
+      ],
       child: const MyApp(),
     ),
   );
