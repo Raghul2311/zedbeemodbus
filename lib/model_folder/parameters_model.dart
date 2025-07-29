@@ -2,7 +2,7 @@ class ParameterModel {
   final String text;
   final double dx;
   final double dy;
-  final int? registerIndex; 
+  final int? registerIndex;
   String value;
 
   ParameterModel({
@@ -12,14 +12,14 @@ class ParameterModel {
     this.registerIndex,
     this.value = "",
   });
-
+  
   Map<String, dynamic> toJson() => {
-        'text': text,
-        'dx': dx,
-        'dy': dy,
-        'registerIndex': registerIndex,
-        'value': value,
-      };
+    'text': text,
+    'dx': dx,
+    'dy': dy,
+    'registerIndex': registerIndex,
+    'value': value,
+  };
 
   factory ParameterModel.fromJson(Map<String, dynamic> json) {
     return ParameterModel(

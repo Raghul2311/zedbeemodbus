@@ -6,8 +6,7 @@ import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:provider/provider.dart';
 import 'package:zedbeemodbus/view_Pages/splash_screen.dart';
 
-final ThemeNotifier themeNotifier =
-    ThemeNotifier(); // Global instance for theme..
+final ThemeNotifier themeNotifier = ThemeNotifier(); //instance for theme..
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
