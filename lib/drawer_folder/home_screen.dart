@@ -149,8 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // AHU Image with overlay
               Center(
                 child: Container(
-                  height: 400,
-                  width: 800,
+                  height: screenHeight * 0.70,
+                  width: screenWidth * 0.90,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     border: Border.all(color: Colors.grey),
@@ -176,8 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Center(
                           child: Image.asset(
                             "images/ahuimage.png",
-                            height: screenHeight * 0.50,
-                            width: screenWidth * 0.53,
+                            height: screenHeight * 0.90,
+                            width: screenWidth * 0.70,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -210,6 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              SpacerWidget.size32,
             ],
           ),
         ),

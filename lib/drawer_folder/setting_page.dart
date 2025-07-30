@@ -363,6 +363,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
+              SpacerWidget.size32,
             ],
           ),
         ),

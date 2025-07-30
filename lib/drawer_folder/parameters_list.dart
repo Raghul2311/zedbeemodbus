@@ -172,7 +172,19 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                             if (isSelected) {
                               selectedIndexes.remove(index);
                             } else {
-                              selectedIndexes.add(index);
+                              if (selectedIndexes.length < 5) {
+                                selectedIndexes.add(index);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Only 5 parameters can be selected at a time !!!!",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             }
                           });
                         },
@@ -286,9 +298,8 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                           underline: SizedBox(),
                           iconEnabledColor:
                               Theme.of(context).brightness == Brightness.dark
-                              ? Colors
-                                    .white 
-                              : Colors.black, 
+                              ? Colors.white
+                              : Colors.black,
                           hint: Text(
                             "Select Register",
                             style: TextStyle(
