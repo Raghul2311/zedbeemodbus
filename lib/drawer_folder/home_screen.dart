@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-                      // parameter from provider dynamically
+                      // parameter from provider dynamically...
                       ...provider.parameters.map((param) {
                         return Positioned(
                           left: param.dx,

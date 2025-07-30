@@ -7,7 +7,6 @@ import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
 
-
 class TrendsScreen extends StatefulWidget {
   const TrendsScreen({super.key});
 

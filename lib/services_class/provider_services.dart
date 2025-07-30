@@ -17,7 +17,7 @@ class ProviderServices extends ChangeNotifier {
 
   // add parameter function
 void addParameters(List<int> indexes, List<Map<String, String>> allParams) {
-  _parameters.clear();
+  // _parameters.clear();
   for (var i in indexes) {
     _parameters.add(
       ParameterModel(
@@ -28,7 +28,7 @@ void addParameters(List<int> indexes, List<Map<String, String>> allParams) {
       ),
     );
   }
-  notifyListeners();
+  notifyListeners();                       
 }
 
 
