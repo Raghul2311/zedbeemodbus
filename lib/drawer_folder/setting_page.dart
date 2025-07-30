@@ -118,9 +118,9 @@ class _SettingPageState extends State<SettingPage> {
                         }).toList(),
                       ),
                     ),
-          
+
                     SpacerWidget.size16w,
-          
+
                     // Equipment Name Dropdown
                     Expanded(
                       child: DropdownButtonFormField<String>(
@@ -152,9 +152,9 @@ class _SettingPageState extends State<SettingPage> {
                         }).toList(),
                       ),
                     ),
-          
+
                     SpacerWidget.size16w,
-          
+
                     // Add AHU Button
                     InkWell(
                       onTap: () {
@@ -255,6 +255,37 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ),
                     ),
+                    SpacerWidget.size8w,
+                    // clear all parmeter
+                    GestureDetector(
+                      onTap: () {
+                        provider.clearParameters();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Parmeter Cleared successfully",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.green, 
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -318,8 +349,9 @@ class _SettingPageState extends State<SettingPage> {
                                       size: 20,
                                       color: Colors.red,
                                     ),
-                                    onPressed: () =>
-                                        provider.removeParameter(item.registerIndex!),
+                                    onPressed: () => provider.removeParameter(
+                                      item.registerIndex!,
+                                    ),
                                   ),
                                 ],
                               ),
