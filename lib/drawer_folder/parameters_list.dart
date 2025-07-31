@@ -19,50 +19,50 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   int? selectedRegister;
   bool isSaving = false;
 
-  final List<Map<String, String>> parameters = [
-    {"name": "Status", "unit": ""},
-    {"name": "Frequency", "unit": "Hz"},
-    {"name": "Auto/Manual", "unit": ""},
-    {"name": "Flowrate", "unit": "m³/h"},
-    {"name": "Water Pressure", "unit": "bar"},
-    {"name": "Duct Pressure", "unit": "bar"},
-    {"name": "Running Hours 1", "unit": "hr"},
-    {"name": "Running Hours 2", "unit": "hr"},
-    {"name": "BTU 1", "unit": "kWh"},
-    {"name": "BTU 2", "unit": "kWh"},
-    {"name": "Water In", "unit": "°C"},
-    {"name": "Water Out", "unit": "°C"},
-    {"name": "Supply Temp", "unit": "°C"},
-    {"name": "Return Temp", "unit": "°C"},
-    {"name": "Stop Condition", "unit": ""},
-    {"name": "Fire Status", "unit": ""},
-    {"name": "Trip Status", "unit": ""},
-    {"name": "Filter Status", "unit": ""},
-    {"name": "NONC Status", "unit": ""},
-    {"name": "Run Status", "unit": ""},
-    {"name": "Auto/Manual Status", "unit": ""},
-    {"name": "N/A", "unit": ""},
-    {"name": "N/A", "unit": ""},
-    {"name": "Water Value", "unit": ""},
-    {"name": "N/A", "unit": ""},
-    {"name": "Voltage", "unit": "V"},
-    {"name": "Current", "unit": "A"},
-    {"name": "Power", "unit": "kW"},
-    {"name": "Delta T Avg", "unit": "°C"},
-    {"name": "Set Temperature", "unit": "°C"},
-    {"name": "Min Frequency", "unit": "Hz"},
-    {"name": "Max Frequency", "unit": "Hz"},
-    {"name": "VAV Number", "unit": ""},
-    {"name": "PID Constant", "unit": ""},
-    {"name": "Ductset Pressure", "unit": "bar"},
-    {"name": "Max FlowRate", "unit": "m³/h"},
-    {"name": "Min FlowRate", "unit": "m³/h"},
-    {"name": "Pressure Constant", "unit": ""},
-    {"name": "Inlet Threshold", "unit": ""},
-    {"name": "Actuator Direction", "unit": ""},
-    {"name": "Actuator Type", "unit": ""},
-    {"name": "Min Act Position", "unit": ""},
-    {"name": "Ramp Up Sel", "unit": ""},
+  final List<Map<String, dynamic>> parameters = [
+    {"name": "Status", "unit": "", "readOnly": false},
+    {"name": "Frequency", "unit": "Hz", "readOnly": false},
+    {"name": "Auto/Manual", "unit": "", "readOnly": false},
+    {"name": "Flowrate", "unit": "m³/h", "readOnly": true},
+    {"name": "Water Pressure", "unit": "bar", "readOnly": true},
+    {"name": "Duct Pressure", "unit": "bar", "readOnly": true},
+    {"name": "Running Hours 1", "unit": "hr", "readOnly": true},
+    {"name": "Running Hours 2", "unit": "hr", "readOnly": true},
+    {"name": "BTU 1", "unit": "kWh", "readOnly": true},
+    {"name": "BTU 2", "unit": "kWh", "readOnly": true},
+    {"name": "Water In", "unit": "°C", "readOnly": true},
+    {"name": "Water Out", "unit": "°C", "readOnly": true},
+    {"name": "Supply Temp", "unit": "°C", "readOnly": true},
+    {"name": "Return Temp", "unit": "°C", "readOnly": true},
+    {"name": "Stop Condition", "unit": "", "readOnly": true},
+    {"name": "Fire Status", "unit": "", "readOnly": true},
+    {"name": "Trip Status", "unit": "", "readOnly": true},
+    {"name": "Filter Status", "unit": "", "readOnly": true},
+    {"name": "NONC Status", "unit": "", "readOnly": true},
+    {"name": "Run Status", "unit": "", "readOnly": true},
+    {"name": "Auto/Manual Status", "unit": "", "readOnly": true},
+    {"name": "N/A", "unit": "", "readOnly": true},
+    {"name": "N/A", "unit": "", "readOnly": true},
+    {"name": "Water Value", "unit": "", "readOnly": false},
+    {"name": "N/A", "unit": "", "readOnly": true},
+    {"name": "Voltage", "unit": "V", "readOnly": true},
+    {"name": "Current", "unit": "A", "readOnly": true},
+    {"name": "Power", "unit": "kW", "readOnly": true},
+    {"name": "Delta T Avg", "unit": "°C", "readOnly": true},
+    {"name": "Set Temperature", "unit": "°C", "readOnly": false},
+    {"name": "Min Frequency", "unit": "Hz", "readOnly": false},
+    {"name": "Max Frequency", "unit": "Hz", "readOnly": false},
+    {"name": "VAV Number", "unit": "", "readOnly": true},
+    {"name": "PID Constant", "unit": "", "readOnly": true},
+    {"name": "Ductset Pressure", "unit": "bar", "readOnly": true},
+    {"name": "Max FlowRate", "unit": "m³/h", "readOnly": false},
+    {"name": "Min FlowRate", "unit": "m³/h", "readOnly": false},
+    {"name": "Pressure Constant", "unit": "", "readOnly": true},
+    {"name": "Inlet Threshold", "unit": "", "readOnly": true},
+    {"name": "Actuator Direction", "unit": "", "readOnly": false},
+    {"name": "Actuator Type", "unit": "", "readOnly": false},
+    {"name": "Min Act Position", "unit": "", "readOnly": false},
+    {"name": "Ramp Up Sel", "unit": "", "readOnly": false},
   ];
 
   List<int> selectedIndexes = []; // store the selected index..
@@ -83,6 +83,12 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     if (selectedRegister == null) {
       showSnackBar("Select a register");
       return;
+    }
+    // read only
+    final isReadOnly = parameters[selectedRegister!]["readOnly"] == true;
+    if(isReadOnly) {
+        showSnackBar("This parameter is only read-only");
+        return;
     }
     if (valueText.isEmpty) {
       showSnackBar("Enter a value");
@@ -309,20 +315,33 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                             ),
                           ),
                           items: selectedIndexes
-                              .map(
-                                (e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(
-                                    parameters[e]["name"]!,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium?.color,
-                                    ),
-                                  ),
+                              // .map(
+                              //   (e) => DropdownMenuItem(
+                              //     value: e,
+                              //     child: Text(
+                              //       parameters[e]["name"]!,
+                              //       style: TextStyle(
+                              //         color: Theme.of(
+                              //           context,
+                              //         ).textTheme.bodyMedium?.color,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // )
+                             // .toList(),
+                             .map((e) {
+                            final isReadOnly = parameters[e]["readOnly"] == true;
+                            return DropdownMenuItem<int>(
+                              value: e,
+                              enabled: !isReadOnly,
+                              child: Text(
+                                "${parameters[e]["name"]}${isReadOnly ? " (Read-Only)" : ""}",
+                                style: TextStyle(
+                                  color: isReadOnly ? Colors.grey : Theme.of(context).textTheme.bodyMedium?.color,
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            );
+                          }).toList(),
                           onChanged: (val) =>
                               setState(() => selectedRegister = val),
                         ),

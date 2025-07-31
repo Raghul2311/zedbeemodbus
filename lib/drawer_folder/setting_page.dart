@@ -292,8 +292,8 @@ class _SettingPageState extends State<SettingPage> {
               SpacerWidget.size64,
               Center(
                 child: Container(
-                  height: screenHeight * 0.70,
-                  width: screenWidth * 0.90,
+                  height: screenHeight * 0.60,
+                  width: screenWidth * 0.80,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     border: Border.all(color: Colors.grey),
@@ -363,7 +363,6 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               ),
-              SpacerWidget.size32,
             ],
           ),
         ),

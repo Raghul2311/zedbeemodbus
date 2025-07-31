@@ -16,7 +16,7 @@ class ProviderServices extends ChangeNotifier {
 
 
   // add parameter function
-void addParameters(List<int> indexes, List<Map<String, String>> allParams) {
+void addParameters(List<int> indexes, List<Map<String, dynamic>> allParams) {
   // _parameters.clear();
   for (var i in indexes) {
     _parameters.add(

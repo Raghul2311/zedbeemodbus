@@ -149,15 +149,15 @@ class _HomeScreenState extends State<HomeScreen> {
               // AHU Image with overlay
               Center(
                 child: Container(
-                  height: screenHeight * 0.70,
-                  width: screenWidth * 0.90,
+                  height: screenHeight * 0.60,
+                  width: screenWidth * 0.80,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Stack(
-                    children: [
+                    children: [                  
                       if (statusValue == 1)
                         Positioned(
                           top: 20,
@@ -167,7 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Center(
                             child: Image.asset(
                               "images/gif.gif",
-                              height: screenHeight,
+                              height: screenHeight * 80,
+                              width: screenWidth * 70,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -181,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.fill,
                           ),
                         ),
-
                       // parameter from provider dynamically...
                       ...provider.parameters.map((param) {
                         return Positioned(
