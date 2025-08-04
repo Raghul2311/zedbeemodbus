@@ -5,7 +5,6 @@ import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
 
-
 class AddAhuFieldScreen extends StatefulWidget {
   const AddAhuFieldScreen({super.key});
 

@@ -14,23 +14,21 @@ class ProviderServices extends ChangeNotifier {
   List<ParameterModel> get parameters => _parameters;
   List<int> get latestValues => _latestValues;
 
-
   // add parameter function
-void addParameters(List<int> indexes, List<Map<String, dynamic>> allParams) {
-  // _parameters.clear();
-  for (var i in indexes) {
-    _parameters.add(
-      ParameterModel(
-        text: allParams[i]["name"]!,
-        dx: 50, // Default X position
-        dy: 100 + _parameters.length * 60, // Default Y position
-        registerIndex: i,
-      ),
-    );
+  void addParameters(List<int> indexes, List<Map<String, dynamic>> allParams) {
+    // _parameters.clear();
+    for (var i in indexes) {
+      _parameters.add(
+        ParameterModel(
+          text: allParams[i]["name"]!,
+          dx: 50, // Default X position
+          dy: 100 + _parameters.length * 60, // Default Y position
+          registerIndex: i,
+        ),
+      );
+    }
+    notifyListeners();
   }
-  notifyListeners();                       
-}
-
 
   // remove parameter function...........
   void removeParameter(int registerIndex) {

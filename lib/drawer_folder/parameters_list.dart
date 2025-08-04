@@ -86,9 +86,9 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     }
     // read only
     final isReadOnly = parameters[selectedRegister!]["readOnly"] == true;
-    if(isReadOnly) {
-        showSnackBar("This parameter is only read-only");
-        return;
+    if (isReadOnly) {
+      showSnackBar("This parameter is only read-only");
+      return;
     }
     if (valueText.isEmpty) {
       showSnackBar("Enter a value");
@@ -314,30 +314,20 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                               ).textTheme.bodyMedium?.color,
                             ),
                           ),
-                          items: selectedIndexes
-                              // .map(
-                              //   (e) => DropdownMenuItem(
-                              //     value: e,
-                              //     child: Text(
-                              //       parameters[e]["name"]!,
-                              //       style: TextStyle(
-                              //         color: Theme.of(
-                              //           context,
-                              //         ).textTheme.bodyMedium?.color,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // )
-                             // .toList(),
-                             .map((e) {
-                            final isReadOnly = parameters[e]["readOnly"] == true;
+                          items: selectedIndexes.map((e) {
+                            final isReadOnly =
+                                parameters[e]["readOnly"] == true;
                             return DropdownMenuItem<int>(
                               value: e,
                               enabled: !isReadOnly,
                               child: Text(
                                 "${parameters[e]["name"]}${isReadOnly ? " (Read-Only)" : ""}",
                                 style: TextStyle(
-                                  color: isReadOnly ? Colors.grey : Theme.of(context).textTheme.bodyMedium?.color,
+                                  color: isReadOnly
+                                      ? Colors.grey
+                                      : Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color,
                                 ),
                               ),
                             );
