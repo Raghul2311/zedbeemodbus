@@ -31,13 +31,6 @@ class _SettingPageState extends State<SettingPage> {
     'Cooling Tower',
   ];
   final List<String> equimentName = ['AHU-01', 'AHU-02', 'AHU-03', 'AHU-04'];
-  final List<String> parameters = [
-    'Flow meter',
-    'Water Temperture',
-    'BTU',
-    'Power',
-    'Voltage',
-  ];
   // track the selected items......
   late String selectedType;
   late String selectedName;

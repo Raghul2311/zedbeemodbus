@@ -16,6 +16,20 @@ class ConfigurationPage extends StatefulWidget {
 
 class _ConfigurationPageState extends State<ConfigurationPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // List for equipment type
+  final List<String> equimentType = [
+    'AHU',
+    'FCU',
+    'VRF',
+    'Chiller',
+    'Cooling Tower',
+  ];
+  final List<String> equimentName = ['AHU-01', 'AHU-02', 'AHU-03', 'AHU-04'];
+
+  late String selectedType; // track the type...
+  late String selectedName;
+
   // controller for field....
   final _formkey = GlobalKey<FormState>();
   final tempHighController = TextEditingController();
@@ -79,6 +93,13 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    selectedType = equimentType.first;
+    selectedName = equimentName.first;
+  }
+
   // scafold Message ...
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -120,6 +141,73 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     ),
                   ),
                 ),
+                SpacerWidget.size32,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.4,
+                      child: DropdownButtonFormField<String>(
+                        value: selectedType,
+                        decoration: InputDecoration(
+                          labelText: 'Equipment Type',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedType = newValue!;
+                          });
+                        },
+                        items: equimentType.map<DropdownMenuItem<String>>((
+                          String value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    SizedBox(
+                      width: screenWidth * 0.4,
+                      child: DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        value: selectedName,
+                        decoration: InputDecoration(
+                          labelText: 'Equipment Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedName = newValue!;
+                          });
+                        },
+                        items: equimentName.map<DropdownMenuItem<String>>((
+                          String value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
                 SpacerWidget.large,
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -127,9 +215,9 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     vertical: 20,
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
+                      SizedBox(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -143,10 +231,11 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                             SpacerWidget.medium,
                             SizedBox(
                               height: 80,
+                              width: screenWidth * 0.24,
                               child: CustomTextFormField(
                                 controller: tempHighController,
                                 cursorColor: cursorColor,
-                                hintText: "Set Temp from 0 to 50",
+                                hintText: "Temp from 0 to 50",
                                 inputFillColor: inputFillColor,
                                 labelColor: labelColor,
                                 keyboardType: TextInputType.numberWithOptions(
@@ -174,8 +263,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           ],
                         ),
                       ),
-                      SpacerWidget.size16w,
-                      Expanded(
+                      SpacerWidget.size32w,
+                      SizedBox(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -189,10 +278,11 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                             SpacerWidget.medium,
                             SizedBox(
                               height: 80,
+                              width: screenWidth * 0.24,
                               child: CustomTextFormField(
                                 controller: tempLowController,
                                 cursorColor: cursorColor,
-                                hintText: "set Temp from 0 to 50",
+                                hintText: "Temp from 0 to 50",
                                 inputFillColor: inputFillColor,
                                 labelColor: labelColor,
                                 keyboardType: TextInputType.numberWithOptions(
@@ -220,8 +310,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           ],
                         ),
                       ),
-                      SpacerWidget.size16w,
-                      Expanded(
+                      SpacerWidget.size32w,
+                      SizedBox(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -235,10 +325,11 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                             SpacerWidget.medium,
                             SizedBox(
                               height: 80,
+                              width: screenWidth * 0.24,
                               child: CustomTextFormField(
                                 controller: minFlowController,
                                 cursorColor: cursorColor,
-                                hintText: "set Temp from 0 to 50",
+                                hintText: "Min Flowrate from 0 to 50",
                                 inputFillColor: inputFillColor,
                                 labelColor: labelColor,
                                 keyboardType: TextInputType.numberWithOptions(
@@ -266,13 +357,13 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           ],
                         ),
                       ),
-                      SpacerWidget.size16w,
+                      SpacerWidget.size32w,
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           SizedBox(
                             height: 55,
-                            width: 100,
+                            width: 130,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.green,
@@ -302,54 +393,57 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Minimun Frequecny",
-                              style: GoogleFonts.roboto(
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SpacerWidget.medium,
-                            SizedBox(
-                              height: 80,
-                              width: screenWidth * 0.30,
-
-                              child: CustomTextFormField(
-                                controller: minFreqController,
-                                cursorColor: cursorColor,
-                                hintText: "set Min Frequency from 0 to 50",
-                                inputFillColor: inputFillColor,
-                                labelColor: labelColor,
-                                keyboardType: TextInputType.numberWithOptions(
-                                  decimal: true,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Minimun Frequecny",
+                                style: GoogleFonts.roboto(
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                 ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d*\.?\d{0,2}'),
-                                  ), // accepts numeric and decimals
-                                ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return null;
-                                  }
-                                  final doubleValue = double.tryParse(value);
-                                  if (doubleValue == null ||
-                                      doubleValue < 0 ||
-                                      doubleValue > 50) {
-                                    return "Frequency Must be 0-50";
-                                  }
-                                  return null;
-                                },
                               ),
-                            ),
-                          ],
+                              SpacerWidget.medium,
+                              SizedBox(
+                                height: 80,
+                                width: screenWidth * 0.24,
+                                child: CustomTextFormField(
+                                  controller: minFreqController,
+                                  cursorColor: cursorColor,
+                                  hintText: "Min Frequency from 0 to 50",
+                                  inputFillColor: inputFillColor,
+                                  labelColor: labelColor,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d{0,2}'),
+                                    ), // accepts numeric and decimals
+                                  ],
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return null;
+                                    }
+                                    final doubleValue = double.tryParse(value);
+                                    if (doubleValue == null ||
+                                        doubleValue < 0 ||
+                                        doubleValue > 50) {
+                                      return "Frequency Must be 0-50";
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       SpacerWidget.size16w,
@@ -367,11 +461,11 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                             SpacerWidget.medium,
                             SizedBox(
                               height: 80,
-                              width: screenWidth * 0.28,
+                              width: screenWidth * 0.24,
                               child: CustomTextFormField(
                                 controller: maxFreqController,
                                 cursorColor: cursorColor,
-                                hintText: "set Max Frequency from 0 to 50",
+                                hintText: "Max Frequency from 0 to 50",
                                 inputFillColor: inputFillColor,
                                 labelColor: labelColor,
                                 keyboardType: TextInputType.numberWithOptions(
@@ -401,6 +495,13 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                       ),
                     ],
                   ),
+                ),
+                Divider(
+                  color: Colors.grey,
+                  height: 10,
+                  thickness: 1,
+                  indent: 30,
+                  endIndent: 30,
                 ),
               ],
             ),
