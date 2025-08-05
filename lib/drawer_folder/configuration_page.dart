@@ -70,31 +70,31 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
       // write function each text fields .....
       if (tempHighController.text.isNotEmpty) {
         double value = double.parse(tempHighController.text);
-        provider.writeRegister(0, value.toInt());
+        provider.writeRegister(50, value.toInt());
         _showSnackbar("High Temp set: $value°C");
       }
 
       if (tempLowController.text.isNotEmpty) {
         double value = double.parse(tempLowController.text);
-        provider.writeRegister(1, value.toInt());
+        provider.writeRegister(49, value.toInt());
         _showSnackbar("Low Temp set: $value°C");
       }
 
       if (minFlowController.text.isNotEmpty) {
         double value = double.parse(minFlowController.text);
-        provider.writeRegister(2, value.toInt());
+        provider.writeRegister(36, value.toInt());
         _showSnackbar("Min Flowrate set: $value");
       }
 
       if (maxFreqController.text.isNotEmpty) {
         double value = double.parse(maxFreqController.text);
-        provider.writeRegister(3, value.toInt());
+        provider.writeRegister(31, value.toInt());
         _showSnackbar("Max Frequency set: $value");
       }
 
       if (minFreqController.text.isNotEmpty) {
         double value = double.parse(minFreqController.text);
-        provider.writeRegister(4, value.toInt());
+        provider.writeRegister(30, value.toInt());
         _showSnackbar("Min Frequency set: $value");
       }
       // clear fields...
@@ -129,7 +129,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12)),
-        const SizedBox(height: 4),
+        SpacerWidget.small,
         SizedBox(
           width: screenWidth * 0.30,
           height: 60,
@@ -142,6 +142,9 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
               fillColor: Colors.grey.shade200,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.darkblue),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8,
