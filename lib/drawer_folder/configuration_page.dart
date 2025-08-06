@@ -90,6 +90,9 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
         const SnackBar(
           content: Text("Please set any value"),
           backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.only(top: 20, left: 16, right: 16),
+
         ),
       );
       return;
@@ -252,6 +255,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
         content: Text(message),
         backgroundColor: AppColors.green,
         duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(top: 20, left: 16, right: 16),
       ),
     );
   }
@@ -265,7 +270,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     FormFieldValidator<String>? validator, // text field validator
   }) {
     final screenWidth = MediaQuery.of(context).size.width; // width
-    // darl theme color
+    // dark theme color
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final inputFillColor = isDarkMode ? Colors.black12 : Colors.white;
     final labelColor = isDarkMode ? Colors.white : Colors.black87;
@@ -389,7 +394,60 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      // floating action button starts here .............
+      floatingActionButton: Container(
+        padding: EdgeInsets.all(12),
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 25),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.black12 : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(child: _equipmentTypeDrowpdown()),
+            SpacerWidget.size32w,
+            Expanded(child: _equipmentNameDropdown()),
+            SpacerWidget.size16w,
+            SizedBox(
+              height: 55,
+              width: screenWidth * 0.15,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange,
+                  foregroundColor: Colors.white,
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                onPressed: () {
+                  _handleSetButton(); // set button function
+                },
+                child: Center(
+                  child: Text(
+                    "Set",
+                    style: GoogleFonts.openSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       key: _scaffoldKey,
       appBar: CustomAppBar(scaffoldKey: _scaffoldKey),
       drawer: AppDrawer(selectedScreen: 'configure'),
@@ -418,14 +476,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(child: _equipmentTypeDrowpdown()),
-                        SpacerWidget.size32w,
-                        Expanded(child: _equipmentNameDropdown()),
-                      ],
-                    ),
-                    SpacerWidget.size32,
                     Row(
                       children: [
                         _customTextfield(
@@ -645,33 +695,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                       ],
                     ),
                   ],
-                ),
-              ),
-              SpacerWidget.size16,
-              SizedBox(
-                height: 55,
-                width: screenWidth * 0.15,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.green,
-                    foregroundColor: Colors.white,
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSetButton(); // set button function
-                  },
-                  child: Center(
-                    child: Text(
-                      "Set",
-                      style: GoogleFonts.openSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],
