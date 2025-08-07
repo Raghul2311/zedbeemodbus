@@ -259,7 +259,7 @@ class _SettingPageState extends State<SettingPage> {
                               "Parmeter Cleared successfully",
                               style: TextStyle(color: Colors.white),
                             ),
-                            backgroundColor: Colors.green, 
+                            backgroundColor: Colors.green,
                           ),
                         );
                       },

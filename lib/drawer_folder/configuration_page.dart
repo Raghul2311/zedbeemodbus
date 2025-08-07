@@ -91,8 +91,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
           content: Text("Please set any value"),
           backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.only(top: 20, left: 16, right: 16),
-
+          margin: EdgeInsets.only(top: 20, left: 16, right: 16),
         ),
       );
       return;
@@ -285,7 +284,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
           child: TextFormField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            cursorColor: Colors.white,
+            cursorColor: isDarkMode ? AppColors.green : AppColors.darkblue,
             style: TextStyle(color: labelColor),
             decoration: InputDecoration(
               filled: true,
@@ -691,7 +690,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                             return null;
                           },
                         ),
-                        SpacerWidget.size16w,
                       ],
                     ),
                   ],
