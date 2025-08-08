@@ -12,6 +12,7 @@ class ModbusServices {
   // Read Holding Registers (Function code 0x03)
   Future<List<int>> readRegisters(int startAddress, int count) async {
     try {
+      // connect to modbus device
       final socket = await Socket.connect(
         ip,
         port,
@@ -22,7 +23,7 @@ class ModbusServices {
       final protocolId = 0x0000;
       final length = 6; // unitId + function code + 4 bytes
       final functionCode = 0x03;
-
+      // build the allocation of 12 bytes request packcets
       final request = Uint8List.fromList([
         (transactionId >> 8) & 0xFF,
         transactionId & 0xFF,
@@ -37,10 +38,10 @@ class ModbusServices {
         (count >> 8) & 0xFF,
         count & 0xFF,
       ]);
-
+      // send request data
       socket.add(request);
       await socket.flush();
-
+      // listen the response
       final completer = Completer<List<int>>();
       final buffer = <int>[];
 
@@ -54,7 +55,7 @@ class ModbusServices {
       final response = await completer.future.timeout(
         const Duration(seconds: 5),
       );
-      socket.destroy();
+      socket.destroy(); // close socket
 
       if (response.length >= 9 + count * 2) {
         List<int> values = [];

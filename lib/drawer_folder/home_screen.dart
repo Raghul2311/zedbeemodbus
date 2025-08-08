@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/model_folder/parameters_model.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
@@ -21,7 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String currentTime = ''; // store current time
-  bool isSwitched = false; // switch for ON/OFF button
+  bool _isOn = false; // bool toggle
+  bool _isLoading = false; // loading indicator
   List<ParameterModel> savedParams = []; // To save the parameters
   // controller for pin text field.......
   final TextEditingController pinController = TextEditingController();
@@ -50,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // media query for height and width...
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final _ = context.watch<ProviderServices>().isSwitchLoading;
+
     final provider = context
         .watch<ProviderServices>(); // listen and update in UI
     final parameters = provider.parameters;
@@ -76,52 +80,66 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // ON/OFF Toggle
-                    Row(
-                      children: [
-                        Text(
-                          'ON',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: (statusValue == 1)
-                                ? Theme.of(context).textTheme.bodyMedium?.color
-                                : Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    // Loading Indicator
+                    if (_isLoading)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 24.0),
+                        child: CircularProgressIndicator(
+                          color: AppColors.green,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Switch(
-                            value: statusValue == 1,
-                            onChanged: (value) {
+                      ),
+                      SpacerWidget.size16w,
+                    // OFF Label
+                    Text(
+                      'OFF',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: _isOn ? Colors.grey[600] : Colors.red,
+                      ),
+                    ),
+                    SpacerWidget.size8,
+                    // Switch with Modbus control
+                    Switch(
+                      value: _isOn,
+                      onChanged: _isLoading
+                          ? null
+                          : (value) async {
                               final newStatus = value ? 1 : 0;
-                              provider.writeRegister(0, newStatus);
+
+                              setState(() => _isLoading = true);
+
+                              // Parameter-controlled Modbus write
+                              await context
+                                  .read<ProviderServices>()
+                                  .writeRegisterInstant(
+                                    0, // parameter register index
+                                    newStatus,
+                                  );
+                              await Future.delayed(const Duration(seconds: 3));
+
+                              setState(() {
+                                _isOn = value;
+                                _isLoading = false;
+                              });
                             },
-                            activeColor: Theme.of(
-                              context,
-                            ).colorScheme.onPrimary,
-                            activeTrackColor: Colors.green,
-                            inactiveThumbColor: Theme.of(
-                              context,
-                            ).colorScheme.onSurface,
-                            inactiveTrackColor: Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest,
-                          ),
-                        ),
-                        Text(
-                          'OFF',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: (statusValue == 1)
-                                ? Colors.grey
-                                : Theme.of(context).textTheme.bodyMedium?.color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                      activeColor: Colors.green,
+                      inactiveTrackColor: Colors.grey[300],
+                      inactiveThumbColor: Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+
+                    // ON Label
+                    Text(
+                      'ON',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: _isOn ? Colors.green : Colors.grey[600],
+                      ),
                     ),
                     SpacerWidget.size16w,
+
                     // Current Time
                     Text(
                       currentTime,
@@ -149,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // AHU Image with overlay
               Center(
                 child: Container(
-                  height: screenHeight * 0.60,
+                  height: screenHeight * 0.65,
                   width: screenWidth * 0.80,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
@@ -157,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Stack(
-                    children: [                  
+                    children: [
                       if (statusValue == 1)
                         Positioned(
                           top: 20,
@@ -167,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Center(
                             child: Image.asset(
                               "images/gif.gif",
-                              height: screenHeight * 80,
+                              height: screenHeight * 85,
                               width: screenWidth * 70,
                               fit: BoxFit.cover,
                             ),

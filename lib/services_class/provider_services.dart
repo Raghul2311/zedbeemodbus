@@ -10,7 +10,8 @@ class ProviderServices extends ChangeNotifier {
   List<int> _latestValues = [];
   Timer? _autoRefreshTimer; // auto refresh 5 seconds
   bool _isWriting = false; // boolean for pasuse refresh....
-
+  bool _isSwitchLoading = false;
+  bool get isSwitchLoading => _isSwitchLoading;
   List<ParameterModel> get parameters => _parameters;
   List<int> get latestValues => _latestValues;
 
@@ -89,6 +90,27 @@ class ProviderServices extends ChangeNotifier {
       startAutoRefresh();
     }
   }
+
+  void setswitchLoading(bool loading) {
+    _isSwitchLoading = loading;
+    notifyListeners();
+  }
+
+  Future<void> writeRegisterInstant(int address, int value) async {
+    setswitchLoading(true); // start loading
+    try {
+      await _modbusService.writeRegister(
+        address,
+        value,
+      ); 
+    } catch (e) {
+      debugPrint("Instant write error: $e");
+    } finally {
+      setswitchLoading(false); // stop loading
+    }
+  }
+
+ 
 
   // refresh every 5 second .........
   void startAutoRefresh() {
