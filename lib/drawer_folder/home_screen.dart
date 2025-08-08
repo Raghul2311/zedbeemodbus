@@ -25,8 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isOn = false; // bool toggle
   bool _isLoading = false; // loading indicator
   List<ParameterModel> savedParams = []; // To save the parameters
-  // controller for pin text field.......
-  final TextEditingController pinController = TextEditingController();
 
   // inintialize the function in init state............
   @override
@@ -52,11 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // media query for height and width...
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final _ = context.watch<ProviderServices>().isSwitchLoading;
 
-    final provider = context
-        .watch<ProviderServices>(); // listen and update in UI
-    final parameters = provider.parameters;
+    final provider = context.watch<ProviderServices>(); // listen
+    // chcek the last value
     final latestValue = provider.latestValues;
     final statusValue = latestValue.isNotEmpty ? latestValue[0] : 0;
 
@@ -88,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppColors.green,
                         ),
                       ),
-                      SpacerWidget.size16w,
+                    SpacerWidget.size16w,
                     // OFF Label
                     Text(
                       'OFF',
@@ -106,9 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? null
                           : (value) async {
                               final newStatus = value ? 1 : 0;
-
                               setState(() => _isLoading = true);
-
                               // Parameter-controlled Modbus write
                               await context
                                   .read<ProviderServices>()
@@ -127,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       inactiveTrackColor: Colors.grey[300],
                       inactiveThumbColor: Colors.red,
                     ),
-                    const SizedBox(width: 8),
-
+                    SpacerWidget.size8w,
                     // ON Label
                     Text(
                       'ON',
@@ -139,7 +132,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SpacerWidget.size16w,
-
                     // Current Time
                     Text(
                       currentTime,

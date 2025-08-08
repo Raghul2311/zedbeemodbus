@@ -8,6 +8,7 @@ import 'package:zedbeemodbus/fields/spacer_widget.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
+import 'package:zedbeemodbus/widgets/toggle_button.dart';
 
 class ConfigurationPage extends StatefulWidget {
   const ConfigurationPage({super.key});
@@ -20,6 +21,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
   // Global keys..
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
+  
   // controllers for fields ...
   final tempHighController = TextEditingController();
   final tempLowController = TextEditingController();
@@ -692,6 +694,41 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                         ),
                       ],
                     ),
+                    SpacerWidget.size32,
+                    // configuration toggle button
+                    Row(
+                      children: [
+                        // Internal and External
+                        CustomToggleContainer(
+                          title: "BTU Selection",
+                          options: ["Internal", "External"],
+                          containerColor: Colors.orange.shade50,
+                          fillColor: Colors.green,
+                          splashColor: Colors.green.shade100,
+                          titleColor: Colors.green,
+                        ),
+                        SpacerWidget.size64w,
+                        CustomToggleContainer(
+                          title: "Control",
+                          options: ["Temperature", "Pressure"],
+                          containerColor: Colors.orange.shade50,
+                          fillColor: Colors.red,
+                          splashColor: Colors.red.shade100,
+                          titleColor: Colors.red,
+                        ),
+                        SpacerWidget.size64w,
+                        CustomToggleContainer(
+                          title: "Actuator Direction",
+                          options: ['Forward', 'Reverse'],
+                          containerColor: Colors.orange.shade50,
+                          fillColor: Colors.blue,
+                          splashColor: Colors.blue.shade100,
+                          titleColor: Colors.blue,
+                        ),
+                      ],
+                    ),
+                    SpacerWidget.size75,
+                    SpacerWidget.size75,
                   ],
                 ),
               ),
