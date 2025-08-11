@@ -110,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     newStatus,
                                   );
                               await Future.delayed(const Duration(seconds: 3));
-
                               setState(() {
                                 _isLoading = false;
                               });
@@ -126,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: statusValue == 1 ? Colors.green : Colors.grey[600],
+                        color: statusValue == 1
+                            ? Colors.green
+                            : Colors.grey[600],
                       ),
                     ),
                     SpacerWidget.size16w,
