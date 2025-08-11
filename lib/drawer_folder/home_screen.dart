@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String currentTime = ''; // store current time
-  bool _isOn = false; // bool toggle
   bool _isLoading = false; // loading indicator
   List<ParameterModel> savedParams = []; // To save the parameters
 
@@ -91,13 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: _isOn ? Colors.grey[600] : Colors.red,
+                        color: statusValue == 1 ? Colors.grey[600] : Colors.red,
                       ),
                     ),
                     SpacerWidget.size8,
                     // Switch with Modbus control
                     Switch(
-                      value: _isOn,
+                      value: statusValue == 1,
                       onChanged: _isLoading
                           ? null
                           : (value) async {
@@ -113,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               await Future.delayed(const Duration(seconds: 3));
 
                               setState(() {
-                                _isOn = value;
                                 _isLoading = false;
                               });
                             },
@@ -128,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: _isOn ? Colors.green : Colors.grey[600],
+                        color: statusValue == 1 ? Colors.green : Colors.grey[600],
                       ),
                     ),
                     SpacerWidget.size16w,

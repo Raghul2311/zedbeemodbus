@@ -21,7 +21,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
   // Global keys..
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
-  
+
   // controllers for fields ...
   final tempHighController = TextEditingController();
   final tempLowController = TextEditingController();
@@ -402,7 +402,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
         padding: EdgeInsets.all(12),
         margin: const EdgeInsets.only(left: 16, right: 16, bottom: 25),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.black12 : Colors.white,
+          color: isDarkMode ? Colors.black : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -702,33 +702,31 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                         CustomToggleContainer(
                           title: "BTU Selection",
                           options: ["Internal", "External"],
-                          containerColor: Colors.orange.shade50,
                           fillColor: Colors.green,
                           splashColor: Colors.green.shade100,
                           titleColor: Colors.green,
                         ),
                         SpacerWidget.size64w,
+                        // temp & pressure
                         CustomToggleContainer(
                           title: "Control",
                           options: ["Temperature", "Pressure"],
-                          containerColor: Colors.orange.shade50,
                           fillColor: Colors.red,
                           splashColor: Colors.red.shade100,
                           titleColor: Colors.red,
                         ),
                         SpacerWidget.size64w,
+                        // Actuator Direction
                         CustomToggleContainer(
                           title: "Actuator Direction",
                           options: ['Forward', 'Reverse'],
-                          containerColor: Colors.orange.shade50,
                           fillColor: Colors.blue,
                           splashColor: Colors.blue.shade100,
                           titleColor: Colors.blue,
                         ),
                       ],
                     ),
-                    SpacerWidget.size75,
-                    SpacerWidget.size75,
+                    const SizedBox(height: 180),
                   ],
                 ),
               ),

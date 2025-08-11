@@ -21,6 +21,7 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  // Key to access app bar...
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<String> equimentType = [
@@ -111,9 +112,7 @@ class _SettingPageState extends State<SettingPage> {
                         }).toList(),
                       ),
                     ),
-
                     SpacerWidget.size16w,
-
                     // Equipment Name Dropdown
                     Expanded(
                       child: DropdownButtonFormField<String>(
@@ -147,7 +146,6 @@ class _SettingPageState extends State<SettingPage> {
                     ),
 
                     SpacerWidget.size16w,
-
                     // Add AHU Button
                     InkWell(
                       onTap: () {

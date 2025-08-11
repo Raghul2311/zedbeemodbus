@@ -6,7 +6,6 @@ import 'package:zedbeemodbus/fields/spacer_widget.dart';
 class CustomToggleContainer extends StatefulWidget {
   final String title;
   final List<String> options;
-  final Color containerColor;
   final Color fillColor;
   final Color splashColor;
   final Color titleColor;
@@ -15,7 +14,6 @@ class CustomToggleContainer extends StatefulWidget {
     super.key,
     required this.title,
     required this.options,
-    required this.containerColor,
     required this.fillColor,
     required this.splashColor,
     required this.titleColor,
@@ -36,10 +34,15 @@ class _CustomToggleContainerState extends State<CustomToggleContainer> {
 
   @override
   Widget build(BuildContext context) {
+    // dark theme
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final fillContainer = isDarkMode ? Colors.black12 : Colors.orange.shade50;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: widget.containerColor,
+        color: fillContainer,
         borderRadius: BorderRadius.circular(15.0),
         boxShadow: <BoxShadow>[
           BoxShadow(
@@ -90,7 +93,11 @@ class _CustomToggleContainerState extends State<CustomToggleContainer> {
           const SizedBox(height: 20.0),
           Text(
             "${widget.title} : ${widget.options[_isSelected.indexOf(true)]}",
-            style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
           ),
         ],
       ),
