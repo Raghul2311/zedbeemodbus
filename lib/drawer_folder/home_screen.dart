@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              "${param.text}: ${param.value.isEmpty ? '--' : param.value}",
+                              "${param.text}: ${param.value.isEmpty ? '--' : provider.getFormattedValue(param.text, int.tryParse(param.value) ?? 0)}",
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,

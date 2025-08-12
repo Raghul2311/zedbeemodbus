@@ -15,6 +15,52 @@ class ProviderServices extends ChangeNotifier {
   List<ParameterModel> get parameters => _parameters;
   List<int> get latestValues => _latestValues;
 
+  // float types parameters .......
+  final List<String> floatValueNames = [
+    "Frequency",
+    "Water In",
+    "Water Out",
+    "Supply Temp",
+    "Return Temp",
+    "Delta T Avg",
+    "Set Temperature",
+    "Min Frequency",
+    "Max Frequency",
+    "Max FlowRate",
+    "Min FlowRate",
+    "Pressure Constant",
+    "Inlet Threshold",
+    "Pressure Temp Sel",
+    "Min Set Temp",
+    "Max Set Temp",
+  ];
+
+  // format values based on parameter name
+  String getFormattedValue(String name, int rawValue) {
+    if (name == "Status" ||
+        name == "Fire Status" ||
+        name == "Schedule ON/OFF") {
+      return rawValue == 1 ? "ON" : "OFF";
+    } else if (name == "Auto/Manual Status") {
+      return rawValue == 0
+          ? "OFF"
+          : rawValue == 1
+          ? "AUTO"
+          : rawValue == 2
+          ? "MANUAL"
+          : "--";
+    } else if (name == "Actuator Direction") {
+      return rawValue == 0
+          ? "Forward"
+          : rawValue == 1
+          ? "Reverse"
+          : "--";
+    } else if (floatValueNames.contains(name)) {
+      return (rawValue / 100).toStringAsFixed(2);
+    }
+    return rawValue.toString();
+  }
+
   // add parameter function
   void addParameters(List<int> indexes, List<Map<String, dynamic>> allParams) {
     // _parameters.clear();
@@ -91,6 +137,7 @@ class ProviderServices extends ChangeNotifier {
     }
   }
 
+  // loading indicator for ON/OFF toggle
   void setswitchLoading(bool loading) {
     _isSwitchLoading = loading;
     notifyListeners();
@@ -99,18 +146,13 @@ class ProviderServices extends ChangeNotifier {
   Future<void> writeRegisterInstant(int address, int value) async {
     setswitchLoading(true); // start loading
     try {
-      await _modbusService.writeRegister(
-        address,
-        value,
-      ); 
+      await _modbusService.writeRegister(address, value);
     } catch (e) {
       debugPrint("Instant write error: $e");
     } finally {
       setswitchLoading(false); // stop loading
     }
   }
-
- 
 
   // refresh every 5 second .........
   void startAutoRefresh() {

@@ -153,25 +153,39 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                       // status ON/OFF
                       String value;
                       value = index < provider.latestValues.length
-                          ? (param["name"] == "Status" ||
-                                    param["name"] == "Fire Status" ||
-                                    param["name"] == "Schedule ON/OFF"
-                                ? (provider.latestValues[index] == 1
-                                      ? "ON"
-                                      : "OFF")
-                                : param["name"] == "Auto/Manual Status"
-                                ? (provider.latestValues[index] == 0
-                                      ? "OFF"
-                                      : provider.latestValues[index] == 1
-                                      ? "AUTO"
-                                      : provider.latestValues[index] == 2
-                                      ? "MANUAL"
-                                      : "--")
-                                : floatValueNames.contains(param["name"])
-                                ? (provider.latestValues[index] / 100)
-                                      .toStringAsFixed(2)
-                                : provider.latestValues[index].toString())
+                          ? provider.getFormattedValue(
+                              param["name"],
+                              provider.latestValues[index],
+                            )
                           : "--";
+
+                      // String value;
+                      // value = index < provider.latestValues.length
+                      //     ? (param["name"] == "Status" ||
+                      //               param["name"] == "Fire Status" ||
+                      //               param["name"] == "Schedule ON/OFF"
+                      //           ? (provider.latestValues[index] == 1
+                      //                 ? "ON"
+                      //                 : "OFF")
+                      //           : param["name"] == "Auto/Manual Status"
+                      //           ? (provider.latestValues[index] == 0
+                      //                 ? "OFF"
+                      //                 : provider.latestValues[index] == 1
+                      //                 ? "AUTO"
+                      //                 : provider.latestValues[index] == 2
+                      //                 ? "MANUAL"
+                      //                 : "--")
+                      //           : param["name"] == "Actuator Direction"
+                      //           ? (provider.latestValues[index] == 0
+                      //                 ? "Forward"
+                      //                 : provider.latestValues[index] == 1
+                      //                 ? "Reverse"
+                      //                 : "--")
+                      //           : floatValueNames.contains(param["name"])
+                      //           ? (provider.latestValues[index] / 100)
+                      //                 .toStringAsFixed(2)
+                      //           : provider.latestValues[index].toString())
+                      //     : "--";
                       // select the parmeter
                       return GestureDetector(
                         onTap: () {

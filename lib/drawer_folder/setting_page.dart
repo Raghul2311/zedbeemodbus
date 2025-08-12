@@ -328,7 +328,7 @@ class _SettingPageState extends State<SettingPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    "${item.text}: ${item.value.isEmpty ? '--' : item.value}",
+                                    "${item.text}: ${item.value.isEmpty ? '--' : provider.getFormattedValue(item.text, int.tryParse(item.value) ?? 0)}",
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
