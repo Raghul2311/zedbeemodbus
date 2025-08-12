@@ -17,9 +17,7 @@ void main() async {
   ]);
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ProviderServices()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => ProviderServices())],
       child: const MyApp(),
     ),
   );
@@ -53,5 +51,5 @@ class MyApp extends StatelessWidget {
         );
       },
     );
-  }     
+  }
 }

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:zedbeemodbus/drawer_folder/parameters_list.dart';
+import 'package:zedbeemodbus/view_Pages/parameters_list.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
 import 'package:zedbeemodbus/fields/shared_pref_helper.dart';
 import 'package:zedbeemodbus/fields/spacer_widget.dart';

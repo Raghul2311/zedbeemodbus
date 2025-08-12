@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:zedbeemodbus/drawer_folder/configuration_page.dart';
-import 'package:zedbeemodbus/drawer_folder/enter_page.dart';
+import 'package:zedbeemodbus/view_Pages/enter_page.dart';
 import 'package:zedbeemodbus/drawer_folder/home_screen.dart';
 import 'package:zedbeemodbus/drawer_folder/setting_page.dart';
 import 'package:zedbeemodbus/fields/colors.dart';

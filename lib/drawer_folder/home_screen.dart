@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable, deprecated_member_use
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:zedbeemodbus/fields/colors.dart';
@@ -10,6 +9,7 @@ import 'package:zedbeemodbus/model_folder/parameters_model.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
+import 'package:zedbeemodbus/widgets/dialogbox.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,6 +75,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    // Unit Text button
+                    TextButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) {
+                            return CustomDialog(
+                              title: "Unit Operation",
+                              onClose: () => Navigator.pop(context),
+                            );
+                          },
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.green.shade300,
+                        foregroundColor: Colors.black54,
+                      ),
+                      icon: const Icon(Icons.ad_units),
+                      label: const Text("Unit Operation"),
+                    ),
                     // Loading Indicator
                     if (_isLoading)
                       Padding(
@@ -144,22 +164,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // Title
-              Center(
-                child: Text(
-                  "AHU Name",
-                  style: GoogleFonts.openSans(
-                    fontSize: 25,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SpacerWidget.size32,
+              // Center(
+              //   child: Text(
+              //     "AHU Name",
+              //     style: GoogleFonts.openSans(
+              //       fontSize: 25,
+              //       color: Theme.of(context).textTheme.bodyMedium?.color,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              // ),
+              // SpacerWidget.size32,
               // AHU Image with overlay
-              Center(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
-                  height: screenHeight * 0.65,
-                  width: screenWidth * 0.80,
+                  height: screenHeight * 0.75,
+                  width: screenWidth,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     border: Border.all(color: Colors.grey),
@@ -176,8 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Center(
                             child: Image.asset(
                               "images/gif.gif",
-                              height: screenHeight * 85,
-                              width: screenWidth * 70,
+                              height: screenHeight,
+                              width: screenWidth,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -186,9 +207,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Center(
                           child: Image.asset(
                             "images/ahuimage.png",
-                            height: screenHeight * 0.90,
-                            width: screenWidth * 0.70,
-                            fit: BoxFit.fill,
+                            height: screenHeight,
+                            width: screenWidth * 0.90,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       // parameter from provider dynamically...

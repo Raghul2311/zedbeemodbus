@@ -14,6 +14,7 @@ class ParametersListScreen extends StatefulWidget {
 }
 
 class _ParametersListScreenState extends State<ParametersListScreen> {
+  // controller ........
   final TextEditingController valueController = TextEditingController();
   bool isSaving = false; // boolean for save button
   final List<Map<String, dynamic>> parameters = [
@@ -79,26 +80,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
     // Total 59 values ............
   ];
 
-  List<int> selectedIndexes = []; // store the selected index..
-  // float types parameters .......
-  final List<String> floatValueNames = [
-    "Frequency",
-    "Water In",
-    "Water Out",
-    "Supply Temp",
-    "Return Temp",
-    "Delta T Avg",
-    "Set Temperature",
-    "Min Frequency",
-    "Max Frequency",
-    "Max FlowRate",
-    "Min FlowRate",
-    "Pressure Constant",
-    "Inlet Threshold",
-    "Pressure Temp Sel",
-    "Min Set Temp",
-    "Max Set Temp",
-  ];
+  List<int> selectedIndexes = []; // store the selected params..
 
   @override
   void initState() {
@@ -158,34 +140,6 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                               provider.latestValues[index],
                             )
                           : "--";
-
-                      // String value;
-                      // value = index < provider.latestValues.length
-                      //     ? (param["name"] == "Status" ||
-                      //               param["name"] == "Fire Status" ||
-                      //               param["name"] == "Schedule ON/OFF"
-                      //           ? (provider.latestValues[index] == 1
-                      //                 ? "ON"
-                      //                 : "OFF")
-                      //           : param["name"] == "Auto/Manual Status"
-                      //           ? (provider.latestValues[index] == 0
-                      //                 ? "OFF"
-                      //                 : provider.latestValues[index] == 1
-                      //                 ? "AUTO"
-                      //                 : provider.latestValues[index] == 2
-                      //                 ? "MANUAL"
-                      //                 : "--")
-                      //           : param["name"] == "Actuator Direction"
-                      //           ? (provider.latestValues[index] == 0
-                      //                 ? "Forward"
-                      //                 : provider.latestValues[index] == 1
-                      //                 ? "Reverse"
-                      //                 : "--")
-                      //           : floatValueNames.contains(param["name"])
-                      //           ? (provider.latestValues[index] / 100)
-                      //                 .toStringAsFixed(2)
-                      //           : provider.latestValues[index].toString())
-                      //     : "--";
                       // select the parmeter
                       return GestureDetector(
                         onTap: () {
