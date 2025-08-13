@@ -312,7 +312,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
       ],
     );
   }
-
   // equipment name drop down widget ...
   Widget _equipmentNameDropdown() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;

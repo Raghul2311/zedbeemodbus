@@ -9,7 +9,7 @@ import 'package:zedbeemodbus/model_folder/parameters_model.dart';
 import 'package:zedbeemodbus/services_class/provider_services.dart';
 import 'package:zedbeemodbus/widgets/app_bar.dart';
 import 'package:zedbeemodbus/widgets/app_drawer.dart';
-import 'package:zedbeemodbus/widgets/dialogbox.dart';
+import 'package:zedbeemodbus/widgets/unit_dialogbox.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -81,10 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         showDialog(
                           context: context,
                           builder: (_) {
-                            return CustomDialog(
-                              title: "Unit Operation",
-                              onClose: () => Navigator.pop(context),
-                            );
+                            return UnitDialogbox();
                           },
                         );
                       },
