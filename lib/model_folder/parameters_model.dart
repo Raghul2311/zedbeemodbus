@@ -3,6 +3,7 @@ class ParameterModel {
   final double dx;
   final double dy;
   final int? registerIndex;
+  final String? unit;
   String value;
 
   ParameterModel({
@@ -11,6 +12,7 @@ class ParameterModel {
     required this.dy,
     this.registerIndex,
     this.value = "",
+    this.unit
   });
   
   Map<String, dynamic> toJson() => {
@@ -19,6 +21,7 @@ class ParameterModel {
     'dy': dy,
     'registerIndex': registerIndex,
     'value': value,
+    'unit':unit,
   };
 
   factory ParameterModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +31,7 @@ class ParameterModel {
       dy: json['dy'],
       registerIndex: json['registerIndex'],
       value: json['value'] ?? "",
+      unit: json['unit'],
     );
   }
 }

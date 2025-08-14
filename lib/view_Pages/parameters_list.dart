@@ -17,68 +17,8 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   // controller ........
   final TextEditingController valueController = TextEditingController();
   bool isSaving = false; // boolean for save button
-  final List<Map<String, dynamic>> parameters = [
-    {"name": "Status", "unit": ""}, // int
-    {"name": "Frequency", "unit": "Hz"}, // float
-    {"name": "Auto/Manual", "unit": ""}, // int
-    {"name": "Flowrate", "unit": "m³/h"}, //
-    {"name": "Water Pressure", "unit": "bar"},
-    {"name": "Duct Pressure", "unit": "bar"},
-    {"name": "Running Hours 1", "unit": "hr"},
-    {"name": "Running Hours 2", "unit": "hr"},
-    {"name": "BTU 1", "unit": "kWh"},
-    {"name": "BTU 2", "unit": "kWh"},
-    {"name": "Water In", "unit": "°C"}, // float
-    {"name": "Water Out", "unit": "°C"}, // float
-    {"name": "Supply Temp", "unit": "°C"}, // float
-    {"name": "Return Temp", "unit": "°C"}, // float
-    {"name": "Stop Condition", "unit": ""},
-    {"name": "Fire Status", "unit": ""}, // int
-    {"name": "Trip Status", "unit": ""}, //int
-    {"name": "Filter Status", "unit": ""}, // int
-    {"name": "NONC Status", "unit": ""}, // int
-    {"name": "Run Status", "unit": ""}, //int
-    {"name": "Auto/Manual Status", "unit": ""}, //int
-    {"name": "N/A", "unit": ""},
-    {"name": "N/A", "unit": ""},
-    {"name": "Water Value", "unit": ""}, //int
-    {"name": "N/A", "unit": ""},
-    {"name": "Voltage", "unit": "V"}, //int
-    {"name": "Current", "unit": "A"}, //int
-    {"name": "Power", "unit": "kW"}, //int
-    {"name": "Delta T Avg", "unit": "°C"}, //float
-    {"name": "Set Temperature", "unit": "°C"}, //float
-    {"name": "Min Frequency", "unit": "Hz"}, //float
-    {"name": "Max Frequency", "unit": "Hz"}, //float
-    {"name": "VAV Number", "unit": ""}, //int
-    {"name": "PID Constant", "unit": ""}, //int
-    {"name": "Ductset Pressure", "unit": "bar"}, //float
-    {"name": "Max FlowRate", "unit": "m³/h"}, //float
-    {"name": "Min FlowRate", "unit": "m³/h"}, //float
-    {"name": "Pressure Constant", "unit": ""}, //float
-    {"name": "Inlet Threshold", "unit": ""}, //float
-    {"name": "Actuator Direction", "unit": ""}, //int
-    {"name": "Actuator Type", "unit": ""}, // int
-    {"name": "Min Act Position", "unit": ""}, //int
-    {"name": "Ramp Up Sel", "unit": ""}, //int
-    {"name": "Water Delta T", "unit": ""}, //int
-    {"name": "Pressure Temp Sel", "unit": ""}, //float
-    {"name": "N/A", "unit": ""},
-    {"name": "Flowmeter Type", "unit": ""}, //int
-    {"name": "7 Span", "unit": ""}, //int
-    {"name": "6 Span", "unit": ""}, //int
-    {"name": "Min Set Temp", "unit": "°C"}, //float
-    {"name": "Max Set Temp", "unit": "°C"}, //float
-    {"name": "1", "unit": ""}, //int
-    {"name": "9600", "unit": ""}, //int
-    {"name": "0", "unit": ""}, //int
-    {"name": "1", "unit": ""}, //int
-    {"name": "Schedule ON/OFF", "unit": ""}, //int
-    {"name": "Schedule ON Time", "unit": ""}, //int
-    {"name": "Schedule OFF Time", "unit": ""}, //int
-    {"name": "Poll Time", "unit": ""}, //int
-    // Total 59 values ............
-  ];
+
+  
 
   List<int> selectedIndexes = []; // store the selected params..
 
@@ -93,7 +33,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   // save the selected parameters
   void saveSelectedParameters() async {
     final provider = Provider.of<ProviderServices>(context, listen: false);
-    provider.addParameters(selectedIndexes, parameters);
+    provider.addParameters(selectedIndexes, provider.allParameters);
     setState(() => isSaving = true);
     await Future.delayed(const Duration(seconds: 1));
     Navigator.pop(context);
@@ -102,6 +42,8 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProviderServices>(context);
+final parameters = provider.allParameters;
+
     final isDark = Theme.of(context).brightness == Brightness.dark; // Theme
     return Scaffold(
       appBar: AppBar(
@@ -136,7 +78,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
                       String value;
                       value = index < provider.latestValues.length
                           ? provider.getFormattedValue(
-                              param["name"],
+                              param["name"] as String,
                               provider.latestValues[index],
                             )
                           : "--";

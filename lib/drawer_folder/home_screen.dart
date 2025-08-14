@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     0, // parameter register index
                                     newStatus,
                                   );
-                              await Future.delayed(const Duration(seconds: 3));
+                              await Future.delayed(const Duration(seconds: 5));
                               setState(() {
                                 _isLoading = false;
                               });
