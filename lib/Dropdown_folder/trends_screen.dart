@@ -152,7 +152,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                   // equipment drop down ..........
                   child: DropdownButtonFormField<String>(
                     isExpanded: true,
-                    value: selectedType,
+                    initialValue: selectedType,
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black),

@@ -98,13 +98,13 @@ class ProviderServices extends ChangeNotifier {
     "Max Set Temp",
   ];
 
-  /// Get unit by index
-  String getUnit(int index) {
-    if (index < allParameters.length) {
-      return allParameters[index]["unit"] ?? "";
-    }
-    return "";
-  }
+  // Get unit by index
+  // String getUnit(int index) {
+  //   if (index < allParameters.length) {
+  //     return allParameters[index]["unit"] ?? "";
+  //   }
+  //   return "";
+  // }
 
   /// Format values based on parameter name + append units
   String getFormattedValue(String name, int rawValue) {

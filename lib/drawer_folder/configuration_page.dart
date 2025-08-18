@@ -1,4 +1,5 @@
-import 'dart:typed_data';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,12 +20,12 @@ class ConfigurationPage extends StatefulWidget {
 
 class _ConfigurationPageState extends State<ConfigurationPage> {
   // Global keys..
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); // text fields
   final _formKey = GlobalKey<FormState>();
 
   // controllers for fields ...
-  final tempHighController = TextEditingController();
-  final tempLowController = TextEditingController();
+  final minTemController = TextEditingController();
+  final maxTempController = TextEditingController();
   final minFlowController = TextEditingController();
   final maxFlowController = TextEditingController();
   final maxFreqController = TextEditingController();
@@ -54,11 +55,12 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
   // selection state ....
   String? selectedEquipment;
   String? selectedName;
+  bool isLoading = false; // loading indiactor
 
   @override
   void dispose() {
-    tempHighController.dispose();
-    tempLowController.dispose();
+    minTemController.dispose();
+    maxTempController.dispose();
     minFlowController.dispose();
     maxFlowController.dispose();
     maxFreqController.dispose();
@@ -73,193 +75,209 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     super.dispose();
   }
 
+  // write function
+  Future<void> writeParameter(
+    BuildContext context,
+    int address,
+    String value,
+    String paramName,
+  ) async {
+    try {
+      // Accept int or float values ...
+      final writeValue = (double.parse(value) * 100).toInt();
+
+      await context.read<ProviderServices>().writeRegister(address, writeValue);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "$paramName changed to $value",
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to change $paramName: $e",
+              style: const TextStyle(color: Colors.black),
+            ),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   // set button function .....
-  void _handleSetButton() {
-    if (tempHighController.text.isEmpty &&
-        tempLowController.text.isEmpty &&
+  void _handleSetButton() async {
+    if (minTemController.text.isEmpty &&
+        maxTempController.text.isEmpty &&
         minFlowController.text.isEmpty &&
         maxFlowController.text.isEmpty &&
-        maxFreqController.text.isEmpty &&
         minFreqController.text.isEmpty &&
+        maxFreqController.text.isEmpty &&
         watervalvecontroller.text.isEmpty &&
         inletcontroller.text.isEmpty &&
         waterdeltacontroller.text.isEmpty &&
-        pressureconstantcontroller.text.isEmpty &&
         waterpressurecontroller.text.isEmpty &&
-        ductpressurecontroller.text.isEmpty &&
+        pressureconstantcontroller.text.isEmpty &&
         pidconstantcontroller.text.isEmpty) {
+      // Empty clicking on set button
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please set any value"),
+          content: Text(
+            "Please set some values",
+            style: TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.only(top: 20, left: 16, right: 16),
         ),
       );
       return;
     }
-    // validation fuction for byte types ...........
-    if (_formKey.currentState!.validate()) {
-      final provider = Provider.of<ProviderServices>(context, listen: false);
-
-      try {
-        // float value
-        if (tempHighController.text.isNotEmpty) {
-          double value = double.parse(tempHighController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int high = bytes.getUint16(0);
-          provider.writeRegister(50, high);
-          _showSnackbar("High Temp value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // flaot value
-        if (tempLowController.text.isNotEmpty) {
-          double value = double.parse(tempLowController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int low = bytes.getUint16(0);
-          provider.writeRegister(49, low);
-          _showSnackbar("Low Temp value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (minFlowController.text.isNotEmpty) {
-          double value = double.parse(minFlowController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int minflow = bytes.getUint16(0);
-          provider.writeRegister(36, minflow);
-          _showSnackbar("Min Flowrate value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (maxFlowController.text.isNotEmpty) {
-          double value = double.parse(maxFlowController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int maxflow = bytes.getUint16(0);
-          provider.writeRegister(36, maxflow);
-          _showSnackbar("Max Flowrate value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (maxFreqController.text.isNotEmpty) {
-          double value = double.parse(maxFreqController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int maxfreq = bytes.getUint16(0);
-          provider.writeRegister(31, maxfreq);
-          _showSnackbar("Max Flowrate value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (minFreqController.text.isNotEmpty) {
-          double value = double.parse(minFreqController.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int minfreq = bytes.getUint16(0);
-          provider.writeRegister(30, minfreq);
-          _showSnackbar("Min Frequecny value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // int value
-        if (watervalvecontroller.text.isNotEmpty) {
-          int value = int.parse(watervalvecontroller.text);
-          provider.writeRegister(23, value);
-          _showSnackbar("water valve value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (inletcontroller.text.isNotEmpty) {
-          double value = double.parse(inletcontroller.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int inlet = bytes.getUint16(0);
-          provider.writeRegister(38, inlet);
-          _showSnackbar("inlet value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (waterdeltacontroller.text.isNotEmpty) {
-          double value = double.parse(waterdeltacontroller.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int delta = bytes.getUint16(0);
-          provider.writeRegister(43, delta);
-          _showSnackbar("water delta value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (pressureconstantcontroller.text.isNotEmpty) {
-          double value = double.parse(pressureconstantcontroller.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int pressure = bytes.getUint16(0);
-          provider.writeRegister(37, pressure);
-          _showSnackbar("Pressure constant value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (ductpressurecontroller.text.isNotEmpty) {
-          double value = double.parse(ductpressurecontroller.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int duct = bytes.getUint16(0);
-          provider.writeRegister(5, duct);
-          _showSnackbar("Duct pressure value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      try {
-        // float value
-        if (pidconstantcontroller.text.isNotEmpty) {
-          double value = double.parse(pidconstantcontroller.text);
-          final bytes = ByteData(4)..setFloat32(0, value, Endian.big);
-          int pdi = bytes.getUint16(0);
-          provider.writeRegister(30, pdi);
-          _showSnackbar("PDI constant value is ${value.toString()}");
-        }
-      } catch (_) {}
-
-      // Clear controllers
-      tempHighController.clear();
-      tempLowController.clear();
-      minFlowController.clear();
-      maxFlowController.clear();
-      maxFreqController.clear();
-      minFreqController.clear();
-      watervalvecontroller.clear();
-      inletcontroller.clear();
-      waterdeltacontroller.clear();
-      pressureconstantcontroller.clear();
-      waterpressurecontroller.clear();
-      ductpressurecontroller.clear();
-      pidconstantcontroller.clear();
+    // validate fields ..
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
-  }
+    setState(() {
+      isLoading = true; // show loading
+    });
 
-  // success message ........
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.green,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(top: 20, left: 16, right: 16),
-      ),
-    );
+    // Delay time
+    await Future.delayed(const Duration(seconds: 2));
+    // mapping register start here .....
+    if (minTemController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        49, // register address for Min Temp
+        minTemController.text.trim(),
+        "Min Temp",
+      );
+    }
+    if (maxTempController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        50, // register address for Min Temp
+        maxTempController.text.trim(),
+        "Max Temp",
+      );
+    }
+    if (minFlowController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        36, // reg address for min flow
+        minFlowController.text.trim(),
+        "Min Flowrate",
+      );
+    }
+    if (maxFlowController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        35, // reg address for max flow
+        maxFlowController.text.trim(),
+        "Max Flowrate",
+      );
+    }
+    if (minFreqController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        30, // reg address for min freq
+        minFreqController.text.trim(),
+        "Min Frequency",
+      );
+    }
+    if (maxFreqController.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        31, // reg address for max freq
+        minFreqController.text.trim(),
+        "Min Frequecny",
+      );
+    }
+    if (watervalvecontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        23, // reg address for water value
+        watervalvecontroller.text.trim(),
+        "Water value",
+      );
+    }
+    if (inletcontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        38, //reg address for inlet
+        inletcontroller.text.trim(),
+        "Inlet Threshold",
+      );
+    }
+    if (waterdeltacontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        43, // reg address for water delta
+        waterdeltacontroller.text.trim(),
+        "Water Delta",
+      );
+    }
+    if (waterpressurecontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        4, // reg address for water pressure
+        waterpressurecontroller.text.trim(),
+        "Water Pressure",
+      );
+    }
+
+    if (ductpressurecontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        5, // reg address for duct pressure
+        ductpressurecontroller.text.trim(),
+        "Duct Pressure",
+      );
+    }
+    if (pressureconstantcontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        37, // reg address for pressure constant
+        pressureconstantcontroller.text.trim(),
+        "Pressure Constant",
+      );
+    }
+
+    if (pidconstantcontroller.text.isNotEmpty) {
+      await writeParameter(
+        context,
+        33, // reg address for pid cosntant
+        pidconstantcontroller.text.trim(),
+        "PID Constant",
+      );
+    }
+
+    setState(() {
+      isLoading = false; // stop loading
+    });
+
+    // clear fields ............
+    minTemController.clear();
+    maxTempController.clear();
+    minFlowController.clear();
+    maxFlowController.clear();
+    minFreqController.clear();
+    maxFreqController.clear();
+    watervalvecontroller.clear();
+    inletcontroller.clear();
+    waterdeltacontroller.clear();
+    waterpressurecontroller.clear();
+    ductpressurecontroller.clear();
+    pressureconstantcontroller.clear();
+    pidconstantcontroller.clear();
   }
 
   // Text field widget ...
@@ -312,6 +330,20 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
       ],
     );
   }
+
+  // validator for text fields
+  String? numberValidator(String? value, String label, double min, double max) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+    final number = double.tryParse(value);
+    if (number == null) return "Invalid number";
+    if (number < min || number > max) {
+      return "Value must be between $min - $max";
+    }
+    return null;
+  }
+
   // equipment name drop down widget ...
   Widget _equipmentNameDropdown() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -319,7 +351,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     final labelColor = isDarkMode ? Colors.white70 : Colors.black87;
     return DropdownButtonFormField<String>(
       isExpanded: true,
-      value: selectedName,
+      initialValue: selectedName,
       decoration: InputDecoration(
         labelText: 'Equipment Name',
         labelStyle: TextStyle(color: labelColor),
@@ -358,7 +390,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     final inputFillColor = isDarkMode ? Colors.black12 : Colors.white;
     final labelColor = isDarkMode ? Colors.white70 : Colors.black87;
     return DropdownButtonFormField<String>(
-      value: selectedEquipment,
+      initialValue: selectedEquipment,
       decoration: InputDecoration(
         labelText: 'Equipment Type',
         labelStyle: TextStyle(color: labelColor),
@@ -434,13 +466,18 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                   _handleSetButton(); // set button function
                 },
                 child: Center(
-                  child: Text(
-                    "Set",
-                    style: GoogleFonts.openSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  child: isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        )
+                      : Text(
+                          "Set",
+                          style: GoogleFonts.openSans(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -479,48 +516,27 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     Row(
                       children: [
                         _customTextfield(
-                          "High Temp",
-                          tempHighController,
+                          "Min Temp",
+                          minTemController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Min Temp", 0, 50),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
-                          "Low Temp",
-                          tempLowController,
+                          "Max Temp",
+                          maxTempController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Max Temp", 0, 50),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "Min Flowrate",
                           minFlowController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Min Flowrate", 0, 50),
                         ),
                         SpacerWidget.size16w,
                       ],
@@ -531,45 +547,24 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           "Max Flowrate",
                           maxFlowController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Max Flowrate", 0, 50),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "Max Freq",
                           maxFreqController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Max Frequency", 0, 50),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "Min Freq",
                           minFreqController,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Min Frequecny", 0, 50),
                         ),
                       ],
                     ),
@@ -581,15 +576,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           "water valve",
                           watervalvecontroller,
                           hintText: "0-100",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 100)) {
-                              return 'values from 0–100 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Water value", 0, 100),
                         ),
                         SpacerWidget.size16w,
                         // _customTextfield(
@@ -600,30 +588,16 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           "Inlet Threshold",
                           inletcontroller,
                           hintText: "0-15",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 15)) {
-                              return 'values from 0–15 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Inlet Threshold", 0, 15),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "water delta T",
                           waterdeltacontroller,
                           hintText: "0-10",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 10)) {
-                              return 'values from 0–10 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Water Delta", 0, 10),
                         ),
                       ],
                     ),
@@ -633,45 +607,24 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           "Water Pressure",
                           waterpressurecontroller,
                           hintText: "0-50",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 50)) {
-                              return 'values from 0–50 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Water Pressure", 0, 50),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "Duct pressure",
                           ductpressurecontroller,
                           hintText: "0-2500",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 2500)) {
-                              return 'values from 0–2500 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Duct Pressure", 0, 2500),
                         ),
                         SpacerWidget.size16w,
                         _customTextfield(
                           "Pressure constant",
                           pressureconstantcontroller,
                           hintText: "0-5",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 5)) {
-                              return 'values from 0–5 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "Pressure Constant", 0, 5),
                         ),
                       ],
                     ),
@@ -681,15 +634,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                           "PDI constant",
                           pidconstantcontroller,
                           hintText: "0-10",
-                          validator: (value) {
-                            if (value!.isEmpty) return null;
-                            final number = double.tryParse(value);
-                            if (number == null) return 'Invalid number';
-                            if ((number < 0 || number > 10)) {
-                              return 'values from 0–10 only';
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              numberValidator(value, "PDI Constant", 0, 10),
                         ),
                       ],
                     ),

@@ -18,8 +18,6 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   final TextEditingController valueController = TextEditingController();
   bool isSaving = false; // boolean for save button
 
-  
-
   List<int> selectedIndexes = []; // store the selected params..
 
   @override
@@ -42,7 +40,7 @@ class _ParametersListScreenState extends State<ParametersListScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProviderServices>(context);
-final parameters = provider.allParameters;
+    final parameters = provider.allParameters;
 
     final isDark = Theme.of(context).brightness == Brightness.dark; // Theme
     return Scaffold(
@@ -149,16 +147,6 @@ final parameters = provider.allParameters;
                                       color: isDark
                                           ? Colors.white
                                           : Colors.black,
-                                    ),
-                                  ),
-                                  SpacerWidget.size8w,
-                                  Text(
-                                    param["unit"]!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: isDark
-                                          ? Colors.grey[300]
-                                          : Colors.black54,
                                     ),
                                   ),
                                 ],
